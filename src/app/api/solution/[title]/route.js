@@ -1,17 +1,16 @@
 import { NextResponse } from "next/server";
-import { PrismaClient } from "@prisma/client";
-
-const prisma = new PrismaClient();
+import Solution from "@/models/Solution";
+import connectDB from "@/lib/db";
 
 export const GET = async (request, { params }) => {
   const { title } = await params;
 
   try {
+    await connectDB();
+
     const getPlaylistVideos = async () => {
-      const videos = await prisma.solution.findFirst({
-        where: {
-          title: title,
-        },
+      const videos = await Solution.findOne({
+        title: title,
       });
 
       return videos;

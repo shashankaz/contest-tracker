@@ -1,18 +1,17 @@
-import { PrismaClient } from "@prisma/client";
 import { NextResponse } from "next/server";
-
-const prisma = new PrismaClient();
+import Solution from "@/models/Solution";
+import connectDB from "@/lib/db";
 
 export const POST = async (req) => {
   const { title, videoUrl, links } = await req.json();
 
   try {
-    const solution = await prisma.solution.create({
-      data: {
-        title,
-        videoUrl,
-        links,
-      },
+    await connectDB();
+
+    const solution = await Solution.create({
+      title,
+      videoUrl,
+      links,
     });
 
     return NextResponse.json({ solution }, { status: 201 });
@@ -27,7 +26,9 @@ export const POST = async (req) => {
 
 export const GET = async () => {
   try {
-    const solutions = await prisma.solution.findMany();
+    await connectDB();
+
+    const solutions = await Solution.find({});
     return NextResponse.json({ solutions }, { status: 200 });
   } catch (error) {
     console.error(error);
