@@ -3,7 +3,6 @@
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import axios from "axios";
-import { formatDistanceToNow, fromUnixTime } from "date-fns";
 import {
   Bookmark,
   BookmarkCheck,
@@ -33,34 +32,33 @@ import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import OverLay from "@/components/OverLay";
 
-interface CodeforcesContest {
-  id: number;
-  name: string;
-  type: string;
-  phase: string;
-  startTimeSeconds: number;
+interface Contest {
+  contest_id: string;
+  contest_name: string;
+  contest_type: string;
+  contest_phase: number;
+  contest_date: string;
+  contest_startTime: string;
+  contest_origin: string;
 }
 
 const Home = () => {
-  const [codeforcesContest, setCodeforcesContest] = useState<
-    CodeforcesContest[]
-  >([]);
+  const [contest, setContest] = useState<Contest[]>([]);
   const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
-  const [bookmarkedContests, setBookmarkedContests] = useState<number[]>([]);
+  const [bookmarkedContests, setBookmarkedContests] = useState<string[]>([]);
   const [showBookmarked, setShowBookmarked] = useState(false);
+  const [platform, setPlatform] = useState("all");
   const [open, setOpen] = useState(false);
   const itemsPerPage = 10;
 
   const router = useRouter();
 
-  const fetchCodeforcesContest = async () => {
+  const fetchContest = async () => {
     try {
       setLoading(true);
-      const codeforcesResponse = await axios.get(
-        "https://codeforces.com/api/contest.list"
-      );
-      setCodeforcesContest(codeforcesResponse.data.result);
+      const codeforcesResponse = await axios.get(`/api/contest/${platform}`);
+      setContest(codeforcesResponse.data);
     } catch (error) {
       console.error(error);
     } finally {
@@ -69,18 +67,18 @@ const Home = () => {
   };
 
   useEffect(() => {
-    fetchCodeforcesContest();
+    fetchContest();
     const savedBookmarks = JSON.parse(
       localStorage.getItem("bookmarkedContests") || "[]"
     );
     setBookmarkedContests(savedBookmarks);
-  }, []);
+  }, [platform]);
 
-  const handleRedirect = (name: string) => {
-    router.push(`/solution/?type=codeforces&name=${name}`);
+  const handleRedirect = (origin: string, name: string) => {
+    router.push(`/solution/?type=${origin}&name=${name}`);
   };
 
-  const handleBookmark = (id: number) => {
+  const handleBookmark = (id: string) => {
     let updatedBookmarks = [...bookmarkedContests];
     if (bookmarkedContests.includes(id)) {
       updatedBookmarks = updatedBookmarks.filter(
@@ -101,10 +99,10 @@ const Home = () => {
   };
 
   const filteredContests = showBookmarked
-    ? codeforcesContest.filter((contest) =>
-        bookmarkedContests.includes(contest.id)
+    ? contest.filter((contest) =>
+        bookmarkedContests.includes(contest.contest_id)
       )
-    : codeforcesContest;
+    : contest;
 
   const totalPages = Math.ceil(filteredContests.length / itemsPerPage);
 
@@ -135,23 +133,14 @@ const Home = () => {
       <div className="flex items-center justify-between h-20">
         <h1 className="text-3xl font-medium">Contest Tracker</h1>
         <div className="hidden md:flex items-center justify-end gap-3">
-          <Select>
+          <Select onValueChange={(value) => setPlatform(value)}>
             <SelectTrigger className="sm:w-[180px]">
               <SelectValue placeholder="Select Platform" />
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">All</SelectItem>
               <SelectItem value="codeforces">Codeforces</SelectItem>
-              <SelectItem
-                value="codechef"
-                disabled
-                className="flex items-center"
-              >
-                Codechef{" "}
-                <span className="text-xs bg-green-500 rounded-full py-0.5 px-2">
-                  Coming Soon!
-                </span>
-              </SelectItem>
+              <SelectItem value="codechef">Codechef</SelectItem>
               <SelectItem
                 value="leetcode"
                 disabled
@@ -180,6 +169,7 @@ const Home = () => {
             setOpen={setOpen}
             showBookmarked={showBookmarked}
             setShowBookmarked={setShowBookmarked}
+            setPlatform={setPlatform}
           />
         </div>
       )}
@@ -205,37 +195,40 @@ const Home = () => {
           {paginatedContests.map((contest) => {
             return (
               <TableRow
-                key={contest.id}
+                key={contest.contest_id}
                 className={cn(
-                  contest.phase === "BEFORE"
+                  contest.contest_phase < 1
                     ? "bg-green-300 dark:bg-green-700"
                     : "bg-red-300 dark:bg-red-700"
                 )}
               >
-                <TableCell>{contest.type}</TableCell>
-                <TableCell>{contest.id}</TableCell>
-                <TableCell>{contest.name}</TableCell>
+                <TableCell>{contest.contest_type}</TableCell>
+                <TableCell>{contest.contest_id}</TableCell>
+                <TableCell>{contest.contest_name}</TableCell>
+                <TableCell>{contest.contest_date}</TableCell>
                 <TableCell>
-                  {fromUnixTime(contest.startTimeSeconds).toLocaleString()}
-                </TableCell>
-                <TableCell>
-                  {formatDistanceToNow(fromUnixTime(contest.startTimeSeconds))}
-                  {contest.phase === "BEFORE" ? " remaining" : " ago"}
+                  {contest.contest_startTime}
+                  {contest.contest_phase < 1 ? " remaining" : " ago"}
                 </TableCell>
                 <TableCell className="flex gap-3 justify-center items-center bg-blue-300 dark:bg-blue-700 h-full">
                   <button
-                    onClick={() => handleBookmark(contest.id)}
+                    onClick={() => handleBookmark(contest.contest_id)}
                     title="Bookmark contest"
                   >
-                    {bookmarkedContests.includes(contest.id) ? (
+                    {bookmarkedContests.includes(contest.contest_id) ? (
                       <BookmarkCheck className="stroke-1" />
                     ) : (
                       <Bookmark className="stroke-1" />
                     )}
                   </button>
                   <button
-                    onClick={() => handleRedirect(contest.name)}
-                    disabled={contest.phase === "BEFORE"}
+                    onClick={() =>
+                      handleRedirect(
+                        contest.contest_origin,
+                        contest.contest_name
+                      )
+                    }
+                    disabled={contest.contest_phase === 0}
                     className="hover:cursor-pointer disabled:hover:cursor-not-allowed"
                     title="View solution"
                   >
