@@ -74,6 +74,10 @@ const Home = () => {
     setBookmarkedContests(savedBookmarks);
   }, [platform]);
 
+  useEffect(() => {
+    setOpen(false);
+  }, [platform, showBookmarked]);
+
   const handleRedirect = (origin: string, name: string) => {
     router.push(`/solution/?type=${origin}&name=${name}`);
   };
@@ -133,7 +137,10 @@ const Home = () => {
       <div className="flex items-center justify-between h-20">
         <h1 className="text-3xl font-medium">Contest Tracker</h1>
         <div className="hidden md:flex items-center justify-end gap-3">
-          <Select onValueChange={(value) => setPlatform(value)}>
+          <Select
+            value={platform}
+            onValueChange={(value) => setPlatform(value)}
+          >
             <SelectTrigger className="sm:w-[180px]">
               <SelectValue placeholder="Select Platform" />
             </SelectTrigger>
@@ -169,6 +176,7 @@ const Home = () => {
             setOpen={setOpen}
             showBookmarked={showBookmarked}
             setShowBookmarked={setShowBookmarked}
+            platform={platform}
             setPlatform={setPlatform}
           />
         </div>
