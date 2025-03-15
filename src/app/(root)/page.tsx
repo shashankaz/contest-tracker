@@ -31,6 +31,7 @@ import { cn } from "@/lib/utils";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import OverLay from "@/components/OverLay";
+import { usePlatform } from "@/store/useStore";
 
 interface Contest {
   contest_id: string;
@@ -48,9 +49,11 @@ const Home = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [bookmarkedContests, setBookmarkedContests] = useState<string[]>([]);
   const [showBookmarked, setShowBookmarked] = useState(false);
-  const [platform, setPlatform] = useState("all");
+  // const [platform, setPlatform] = useState("all");
   const [open, setOpen] = useState(false);
   const itemsPerPage = 10;
+
+  const { platform, setPlatform } = usePlatform();
 
   const router = useRouter();
 
@@ -139,7 +142,9 @@ const Home = () => {
         <div className="hidden md:flex items-center justify-end gap-3">
           <Select
             value={platform}
-            onValueChange={(value) => setPlatform(value)}
+            onValueChange={(
+              value: "all" | "codeforces" | "codechef" | "leetcode"
+            ) => setPlatform(value)}
           >
             <SelectTrigger className="sm:w-[180px]">
               <SelectValue placeholder="Select Platform" />

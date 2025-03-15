@@ -14,7 +14,7 @@ interface OverLayProps {
   showBookmarked: boolean;
   setShowBookmarked: (value: boolean) => void;
   platform: string;
-  setPlatform: (value: string) => void;
+  setPlatform: (value: "all" | "codeforces" | "codechef" | "leetcode") => void;
 }
 
 const OverLay = ({
@@ -37,7 +37,9 @@ const OverLay = ({
         <div className="flex flex-col gap-4">
           <Select
             value={platform}
-            onValueChange={(value) => setPlatform(value)}
+            onValueChange={(
+              value: "all" | "codeforces" | "codechef" | "leetcode"
+            ) => setPlatform(value)}
           >
             <SelectTrigger className="w-full">
               <SelectValue placeholder="Select Platform" />
