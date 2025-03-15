@@ -118,7 +118,7 @@ const Solution = () => {
     <div className="h-screen py-4">
       <div className="flex items-end gap-4">
         <button
-          className="p-1 border rounded-full border-black hover:cursor-pointer"
+          className="p-1 border rounded-full border-black dark:border-white hover:cursor-pointer"
           onClick={() => router.push("/")}
         >
           <ChevronLeft className="size-5 stroke-1" />
@@ -131,11 +131,11 @@ const Solution = () => {
           <Link
             href={currentSolution.videoUrl}
             target="_blank"
-            className="text-2xl font-medium mt-2 hover:underline flex items-center gap-2"
+            className="text-2xl font-medium mt-6 hover:underline flex items-center gap-2"
             title="Watch video"
           >
             {name}
-            <ExternalLink className="size-6" />
+            <ExternalLink className="size-6 hidden sm:block" />
           </Link>
           <ul className="mt-3 list-decimal list-inside space-y-0.5">
             {currentSolution.description ? (
