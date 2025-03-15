@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import Image from "next/image";
 import axios from "axios";
 import {
@@ -105,18 +105,24 @@ const Home = () => {
     setCurrentPage(newPage);
   };
 
-  const filteredContests = showBookmarked
-    ? contest.filter((contest) =>
-        bookmarkedContests.includes(contest.contest_id)
-      )
-    : contest;
+  const filteredContests = useMemo(() => {
+    return showBookmarked
+      ? contest.filter((contest) =>
+          bookmarkedContests.includes(contest.contest_id)
+        )
+      : contest;
+  }, [showBookmarked, contest, bookmarkedContests]);
 
-  const totalPages = Math.ceil(filteredContests.length / itemsPerPage);
+  const totalPages = useMemo(() => {
+    return Math.ceil(filteredContests.length / itemsPerPage);
+  }, [filteredContests.length, itemsPerPage]);
 
-  const paginatedContests = filteredContests.slice(
-    (currentPage - 1) * itemsPerPage,
-    currentPage * itemsPerPage
-  );
+  const paginatedContests = useMemo(() => {
+    return filteredContests.slice(
+      (currentPage - 1) * itemsPerPage,
+      currentPage * itemsPerPage
+    );
+  }, [filteredContests, currentPage, itemsPerPage]);
 
   if (loading) {
     return (
