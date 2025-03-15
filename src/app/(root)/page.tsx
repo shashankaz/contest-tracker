@@ -135,7 +135,7 @@ const Home = () => {
   return (
     <div>
       <div className="flex items-center justify-between h-20">
-        <h1 className="text-3xl font-medium">Contest Tracker</h1>
+        <h1 className="text-3xl md:text-4xl font-semibold">Contest Tracker</h1>
         <div className="hidden md:flex items-center justify-end gap-3">
           <Select
             value={platform}
