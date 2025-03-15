@@ -41,7 +41,7 @@ export const GET = async (request, { params }) => {
     const videos = await getPlaylistVideos();
 
     const filteredVideos = videos.filter((solution) => {
-      const modifiedTitle = solution.title.split(" | ")[0];
+      const modifiedTitle = solution.title.split(" | ")[0].slice(11);
       const slugifiedTitle = slugify(modifiedTitle, {
         lower: true,
         remove: /[^\w\s-]/g,
