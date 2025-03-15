@@ -185,7 +185,7 @@ const Solution = () => {
                     rel="noopener noreferrer"
                     className="hover:underline font-medium"
                   >
-                    Problem {index + 1}
+                    Problem {String.fromCharCode(65 + index)} Solution
                   </Link>
                 </li>
               ))
