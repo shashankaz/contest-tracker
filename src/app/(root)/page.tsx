@@ -4,7 +4,12 @@ import { useEffect, useState } from "react";
 import Image from "next/image";
 import axios from "axios";
 import { formatDistanceToNow, fromUnixTime } from "date-fns";
-import { Bookmark, BookmarkCheck, ExternalLink } from "lucide-react";
+import {
+  Bookmark,
+  BookmarkCheck,
+  ExternalLink,
+  SquareChevronLeft,
+} from "lucide-react";
 
 import {
   Table,
@@ -15,10 +20,18 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { ModeToggle } from "@/components/theme-toggle";
 import { cn } from "@/lib/utils";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
+import OverLay from "@/components/OverLay";
 
 interface CodeforcesContest {
   id: number;
@@ -35,6 +48,8 @@ const Home = () => {
   const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
   const [bookmarkedContests, setBookmarkedContests] = useState<number[]>([]);
+  const [showBookmarked, setShowBookmarked] = useState(false);
+  const [open, setOpen] = useState(false);
   const itemsPerPage = 10;
 
   const router = useRouter();
@@ -85,7 +100,15 @@ const Home = () => {
     setCurrentPage(newPage);
   };
 
-  const paginatedContests = codeforcesContest.slice(
+  const filteredContests = showBookmarked
+    ? codeforcesContest.filter((contest) =>
+        bookmarkedContests.includes(contest.id)
+      )
+    : codeforcesContest;
+
+  const totalPages = Math.ceil(filteredContests.length / itemsPerPage);
+
+  const paginatedContests = filteredContests.slice(
     (currentPage - 1) * itemsPerPage,
     currentPage * itemsPerPage
   );
@@ -111,8 +134,55 @@ const Home = () => {
     <div>
       <div className="flex items-center justify-between h-20">
         <h1 className="text-3xl font-medium">Contest Tracker</h1>
-        <ModeToggle />
+        <div className="hidden md:flex items-center justify-end gap-3">
+          <Select>
+            <SelectTrigger className="sm:w-[180px]">
+              <SelectValue placeholder="Select Platform" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All</SelectItem>
+              <SelectItem value="codeforces">Codeforces</SelectItem>
+              <SelectItem
+                value="codechef"
+                disabled
+                className="flex items-center"
+              >
+                Codechef{" "}
+                <span className="text-xs bg-green-500 rounded-full py-0.5 px-2">
+                  Coming Soon!
+                </span>
+              </SelectItem>
+              <SelectItem
+                value="leetcode"
+                disabled
+                className="flex items-center"
+              >
+                Leetcode{" "}
+                <span className="text-xs bg-green-500 rounded-full py-0.5 px-2">
+                  Coming Soon!
+                </span>
+              </SelectItem>
+            </SelectContent>
+          </Select>
+          <Button onClick={() => setShowBookmarked(!showBookmarked)}>
+            {showBookmarked ? "Show All" : "Show Bookmarked"}
+          </Button>
+          <ModeToggle />
+        </div>
+        <button className="flex md:hidden" onClick={() => setOpen(true)}>
+          <SquareChevronLeft />
+        </button>
       </div>
+
+      {open && (
+        <div className="fixed inset-0 bg-black/50 z-10">
+          <OverLay
+            setOpen={setOpen}
+            showBookmarked={showBookmarked}
+            setShowBookmarked={setShowBookmarked}
+          />
+        </div>
+      )}
 
       <Table>
         <TableCaption>
@@ -187,7 +257,7 @@ const Home = () => {
         </Button>
         <Button
           onClick={() => handlePageChange(currentPage + 1)}
-          disabled={currentPage * itemsPerPage >= codeforcesContest.length}
+          disabled={currentPage >= totalPages}
         >
           Next
         </Button>
