@@ -41,11 +41,12 @@ export const GET = async (request, { params }) => {
     const videos = await getPlaylistVideos();
 
     const filteredVideos = videos.filter((solution) => {
-      const slugifiedTitle = slugify(solution.title, {
+      const modifiedTitle = solution.title.split(" | ")[0].slice(10);
+      const slugifiedTitle = slugify(modifiedTitle, {
         lower: true,
         remove: /[^\w\s-]/g,
       });
-      return slugifiedTitle.includes(modifiedName);
+      return modifiedName.includes(slugifiedTitle);
     });
 
     return NextResponse.json(filteredVideos, { status: 200 });
