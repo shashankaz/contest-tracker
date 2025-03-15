@@ -22,6 +22,11 @@ const extractCodeforcesLinks = (text: string): string[] => {
   return text.match(regex) || [];
 };
 
+const extractCodechefLinks = (text: string): string[] => {
+  const regex = /https:\/\/www\.codechef\.com\/viewsolution\/\d+/g;
+  return text.match(regex) || [];
+};
+
 const Solution = () => {
   const [currentSolution, setCurrentSolution] = useState<Solution | null>(null);
   const [loading, setLoading] = useState(true);
@@ -63,8 +68,41 @@ const Solution = () => {
     }
   };
 
+  const fetchCodechefSolution = async () => {
+    try {
+      setLoading(true);
+      const response = await fetch(`/api/codechef/${name}`);
+      const data: Solution[] = await response.json();
+
+      if (data.length > 0) {
+        setCurrentSolution({
+          ...data[0],
+          description: extractCodechefLinks(data[0].description).join("\n"),
+        });
+      } else {
+        const response = await fetch(`/api/solution/${name}`);
+        const data: Solution[] = await response.json();
+
+        if (data.length > 0) {
+          setCurrentSolution({
+            ...data[0],
+            description: data[0].links.join("\n"),
+          });
+        }
+      }
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
     if (type === "codeforces" && name) {
+      fetchCodeforcesSolution();
+    } else if (type === "codechef" && name) {
+      fetchCodechefSolution();
+    } else if (type === "leetcode" && name) {
       fetchCodeforcesSolution();
     }
   }, [type, name]);
