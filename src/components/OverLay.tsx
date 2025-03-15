@@ -13,12 +13,14 @@ interface OverLayProps {
   setOpen: (value: boolean) => void;
   showBookmarked: boolean;
   setShowBookmarked: (value: boolean) => void;
+  setPlatform: (value: string) => void;
 }
 
 const OverLay = ({
   setOpen,
   showBookmarked,
   setShowBookmarked,
+  setPlatform,
 }: OverLayProps) => {
   return (
     <div className="fixed inset-0 flex">
@@ -31,23 +33,14 @@ const OverLay = ({
           <ModeToggle />
         </div>
         <div className="flex flex-col gap-4">
-          <Select>
+          <Select onValueChange={(value) => setPlatform(value)}>
             <SelectTrigger className="w-full">
               <SelectValue placeholder="Select Platform" />
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">All</SelectItem>
               <SelectItem value="codeforces">Codeforces</SelectItem>
-              <SelectItem
-                value="codechef"
-                disabled
-                className="flex items-center"
-              >
-                Codechef{" "}
-                <span className="text-xs bg-green-500 rounded-full py-0.5 px-2">
-                  Coming Soon!
-                </span>
-              </SelectItem>
+              <SelectItem value="codechef">Codechef</SelectItem>
               <SelectItem
                 value="leetcode"
                 disabled
