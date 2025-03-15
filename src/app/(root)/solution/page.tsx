@@ -153,7 +153,7 @@ const Solution = () => {
   }
 
   return (
-    <div className="h-screen py-4">
+    <div className="py-4">
       <div className="flex items-end gap-4">
         <button
           className="p-1 border rounded-full border-black dark:border-white hover:cursor-pointer"
