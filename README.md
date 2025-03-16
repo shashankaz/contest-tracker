@@ -12,6 +12,10 @@ Contest Tracker is an online tool designed to help users easily manage and keep 
 - **ODM (Object-Document Mapping)**: Mongoose
 - **Utilities**: date-fns, clsx, slugify
 
+## Demo Video
+
+You can watch the live demo of the application by clicking [here](https://www.loom.com/share/71d3203053d041ddbec9bc8c7aa87ac9?sid=b98d7396-dbe5-427b-b279-591605b109c8).
+
 ## Application Features
 
 ### Routes
