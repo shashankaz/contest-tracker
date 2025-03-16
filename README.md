@@ -11,6 +11,7 @@ Contest Tracker is an online tool designed to help users easily manage and keep 
 - **HTTP Client**: Axios
 - **ODM (Object-Document Mapping)**: Mongoose
 - **Utilities**: date-fns, clsx, slugify
+- **Cache**: Redis
 
 ## Demo Video
 
@@ -46,3 +47,6 @@ The UI is fully responsive, ensuring a seamless user experience across desktop, 
 - `GET /api/leetcode/{title}`: If the contest title is present in the playlist, it extracts the links from the YouTube video description and returns them. Otherwise, it checks `/api/solution/{title}` and if not found, a form is displayed where a team member can manually attach the solution link.
 - `GET /api/codeforces`: Lists YouTube playlist video metadata for Codeforces contests.
 - `GET /api/codeforces/{title}`: If the contest title is present in the playlist, it extracts the links from the YouTube video description and returns them. Otherwise, it checks `/api/solution/{title}` and if not found, a form is displayed where a team member can manually attach the solution link.
+
+### Caching
+- Redis is used to cache frequently accessed contest lists, improving performance and reducing database load by minimizing the number of queries.
