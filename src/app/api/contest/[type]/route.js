@@ -76,11 +76,37 @@ export const GET = async (req, { params }) => {
       });
 
       // Total 1976 responses till 16/03/2025
-      for (let offset = 20; offset <= 100; offset += 20) {
-        const responseOld = await axios.get(
-          `https://www.codechef.com/api/list/contests/past?sort_by=START&sorting_order=desc&offset=${offset}&mode=all`
-        );
+      // for (let offset = 20; offset <= 100; offset += 20) {
+      //   const responseOld = await axios.get(
+      //     `https://www.codechef.com/api/list/contests/past?sort_by=START&sorting_order=desc&offset=${offset}&mode=all`
+      //   );
 
+      //   responseOld.data.contests.forEach((contest) => {
+      //     contests.push({
+      //       contest_id: contest.contest_code,
+      //       contest_name: contest.contest_name,
+      //       contest_type: "CodeChef",
+      //       contest_phase: contest.distinct_users,
+      //       contest_date: contest.contest_start_date,
+      //       contest_startTime: formatDistanceToNow(
+      //         contest.contest_start_date_iso
+      //       ),
+      //       contest_origin: "codechef",
+      //     });
+      //   });
+      // }
+
+      // Only fetching 200 contests for now + upcoming contests
+      const offsets = Array.from({ length: 9 }, (_, i) => 20 + i * 20);
+      const pastContestPromises = offsets.map((offset) =>
+        axios.get(
+          `https://www.codechef.com/api/list/contests/past?sort_by=START&sorting_order=desc&offset=${offset}&mode=all`
+        )
+      );
+
+      const pastContestResponses = await Promise.all(pastContestPromises);
+
+      pastContestResponses.forEach((responseOld) => {
         responseOld.data.contests.forEach((contest) => {
           contests.push({
             contest_id: contest.contest_code,
@@ -94,7 +120,7 @@ export const GET = async (req, { params }) => {
             contest_origin: "codechef",
           });
         });
-      }
+      });
     };
 
     const fetchCodeforces = async () => {
@@ -133,6 +159,7 @@ export const GET = async (req, { params }) => {
 
         totalResults = response.data.length;
 
+        // Total 214 responses till 16/03/2025
         response.data.forEach((contest) => {
           const adjustedStartTime = addMinutes(
             addHours(new Date(contest.startTime), 5),
