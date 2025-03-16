@@ -50,16 +50,7 @@ const OverLay = ({
               <SelectItem value="all">All</SelectItem>
               <SelectItem value="codeforces">Codeforces</SelectItem>
               <SelectItem value="codechef">Codechef</SelectItem>
-              <SelectItem
-                value="leetcode"
-                disabled
-                className="flex items-center"
-              >
-                Leetcode{" "}
-                <span className="text-xs bg-green-500 rounded-full py-0.5 px-2">
-                  Coming Soon!
-                </span>
-              </SelectItem>
+              <SelectItem value="leetcode">Leetcode</SelectItem>
             </SelectContent>
           </Select>
           <Button onClick={() => setShowBookmarked(!showBookmarked)}>
