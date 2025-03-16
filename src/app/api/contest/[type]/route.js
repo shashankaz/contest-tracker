@@ -118,7 +118,7 @@ export const GET = async (req, { params }) => {
             30
           );
           contests.push({
-            contest_id: contest._id.slice(0, 5),
+            contest_id: contest._id,
             contest_name: contest.title,
             contest_type: "LeetCode",
             contest_phase: contest.past ? 1 : 0,
