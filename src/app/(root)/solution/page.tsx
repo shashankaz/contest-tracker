@@ -27,6 +27,11 @@ const extractCodechefLinks = (text: string): string[] => {
   return text.match(regex) || [];
 };
 
+const extractLeetcodeLinks = (text: string): string[] => {
+  const regex = /https:\/\/leetcode\.com\/[a-z0-9-]+\/?/g;
+  return text.match(regex) || [];
+};
+
 const Solution = () => {
   const [currentSolution, setCurrentSolution] = useState<Solution | null>(null);
   const [loading, setLoading] = useState(true);
@@ -97,13 +102,44 @@ const Solution = () => {
     }
   };
 
+  const fetchLeetcodeSolution = async () => {
+    try {
+      setLoading(true);
+      const response = await fetch(`/api/leetcode/${name}`);
+      const data: Solution[] = await response.json();
+
+      console.log(data);
+
+      if (data.length > 0) {
+        setCurrentSolution({
+          ...data[0],
+          description: extractLeetcodeLinks(data[0].description).join("\n"),
+        });
+      } else {
+        const response = await fetch(`/api/solution/${name}`);
+        const data: Solution[] = await response.json();
+
+        if (data.length > 0) {
+          setCurrentSolution({
+            ...data[0],
+            description: data[0].links.join("\n"),
+          });
+        }
+      }
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
     if (type === "codeforces" && name) {
       fetchCodeforcesSolution();
     } else if (type === "codechef" && name) {
       fetchCodechefSolution();
     } else if (type === "leetcode" && name) {
-      fetchCodeforcesSolution();
+      fetchLeetcodeSolution();
     }
   }, [type, name]);
 
