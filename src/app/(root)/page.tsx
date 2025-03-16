@@ -195,7 +195,7 @@ const Home = () => {
           <Button onClick={() => setShowBookmarked(!showBookmarked)}>
             {showBookmarked ? "Show All" : "Show Bookmarked"}
           </Button>
-          <Button variant="secondary">
+          <Button variant="secondary" title="Live users">
             <Eye /> {liveUsers}
           </Button>
           <ModeToggle />
