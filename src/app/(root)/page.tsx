@@ -213,7 +213,11 @@ const Home = () => {
                 )}
               >
                 <TableCell>{contest.contest_type}</TableCell>
-                <TableCell>{contest.contest_id}</TableCell>
+                <TableCell>
+                  {contest.contest_origin === "leetcode"
+                    ? contest.contest_name.split(" ")[0]
+                    : contest.contest_id}
+                </TableCell>
                 <TableCell>{contest.contest_name}</TableCell>
                 <TableCell>{contest.contest_date}</TableCell>
                 <TableCell>
