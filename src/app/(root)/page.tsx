@@ -7,6 +7,7 @@ import {
   Bookmark,
   BookmarkCheck,
   ExternalLink,
+  Eye,
   SquareChevronLeft,
 } from "lucide-react";
 
@@ -32,6 +33,7 @@ import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import OverLay from "@/components/OverLay";
 import { usePlatform } from "@/store/useStore";
+import { io } from "socket.io-client";
 
 interface Contest {
   contest_id: string;
@@ -52,6 +54,7 @@ const Home = () => {
   // const [platform, setPlatform] = useState("all");
   const [open, setOpen] = useState(false);
   const itemsPerPage = 10;
+  const [liveUsers, setLiveUsers] = useState(0);
 
   const { platform, setPlatform } = usePlatform();
 
@@ -80,6 +83,33 @@ const Home = () => {
   useEffect(() => {
     setOpen(false);
   }, [platform, showBookmarked]);
+
+  useEffect(() => {
+    const socketUrl = process.env.NEXT_PUBLIC_WEBSOCKETS_URL as string;
+    const socket = io(socketUrl);
+
+    socket.on("connect", () => {
+      console.log("Connected to socket server");
+    });
+
+    socket.on("connect_error", (err) => {
+      console.error("Connection error:", err);
+    });
+
+    socket.on("disconnect", (reason) => {
+      console.log("Disconnected from socket server:", reason);
+    });
+
+    socket.on("userCount", (count) => {
+      console.log(`Received user count: ${count}`);
+      setLiveUsers(count);
+    });
+
+    return () => {
+      socket.disconnect();
+      console.log("Socket disconnected");
+    };
+  }, []);
 
   const handleRedirect = (origin: string, name: string) => {
     router.push(`/solution/?type=${origin}&name=${name}`);
@@ -165,6 +195,9 @@ const Home = () => {
           <Button onClick={() => setShowBookmarked(!showBookmarked)}>
             {showBookmarked ? "Show All" : "Show Bookmarked"}
           </Button>
+          <Button variant="secondary">
+            <Eye /> {liveUsers}
+          </Button>
           <ModeToggle />
         </div>
         <button className="flex md:hidden" onClick={() => setOpen(true)}>
@@ -180,6 +213,7 @@ const Home = () => {
             setShowBookmarked={setShowBookmarked}
             platform={platform}
             setPlatform={setPlatform}
+            liveUsers={liveUsers}
           />
         </div>
       )}

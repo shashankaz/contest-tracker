@@ -5,7 +5,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { SquareChevronRight } from "lucide-react";
+import { Eye, SquareChevronRight } from "lucide-react";
 import { ModeToggle } from "./theme-toggle";
 import { Button } from "./ui/button";
 
@@ -15,6 +15,7 @@ interface OverLayProps {
   setShowBookmarked: (value: boolean) => void;
   platform: string;
   setPlatform: (value: "all" | "codeforces" | "codechef" | "leetcode") => void;
+  liveUsers: number;
 }
 
 const OverLay = ({
@@ -23,6 +24,7 @@ const OverLay = ({
   setShowBookmarked,
   platform,
   setPlatform,
+  liveUsers,
 }: OverLayProps) => {
   return (
     <div className="fixed inset-0 flex">
@@ -62,6 +64,9 @@ const OverLay = ({
           </Select>
           <Button onClick={() => setShowBookmarked(!showBookmarked)}>
             {showBookmarked ? "Show All" : "Show Bookmarked"}
+          </Button>
+          <Button variant="secondary">
+            <Eye /> {liveUsers}
           </Button>
         </div>
       </div>
