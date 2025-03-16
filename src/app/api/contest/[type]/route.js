@@ -1,6 +1,12 @@
 import { NextResponse } from "next/server";
 import axios from "axios";
-import { format, formatDistanceToNow, fromUnixTime } from "date-fns";
+import {
+  format,
+  formatDistanceToNow,
+  fromUnixTime,
+  addMinutes,
+  addHours,
+} from "date-fns";
 
 export const GET = async (req, { params }) => {
   let contests = [];
@@ -83,7 +89,8 @@ export const GET = async (req, { params }) => {
           contest_phase: contest.phase === "FINISHED" ? 1 : 0,
           contest_date: format(
             new Date(contest.startTimeSeconds * 1000),
-            "dd MMM yyyy HH:mm:ss"
+            "dd MMM yyyy HH:mm:ss",
+            { timeZone: "Asia/Kolkata" }
           ),
           contest_startTime: formatDistanceToNow(
             fromUnixTime(contest.startTimeSeconds)
@@ -93,16 +100,53 @@ export const GET = async (req, { params }) => {
       });
     };
 
-    if (type === "codechef") {
-      await fetchCodechef();
-    } else if (type === "codeforces") {
-      await fetchCodeforces();
-    } else if (type === "leetcode") {
-      await fetchCodeforces();
-    } else if (type === "all") {
-      await fetchCodechef();
-      await fetchCodeforces();
-    }
+    const fetchLeetcode = async () => {
+      let skip = 0;
+      const limit = 25;
+      let totalResults = 0;
+
+      do {
+        const response = await axios.get(
+          `https://lccn.lbao.site/api/v1/contests/?skip=${skip}&limit=${limit}`
+        );
+
+        totalResults = response.data.length;
+
+        response.data.forEach((contest) => {
+          const adjustedStartTime = addMinutes(
+            addHours(new Date(contest.startTime), 5),
+            30
+          );
+          contests.push({
+            contest_id: contest._id.slice(0, 5),
+            contest_name: contest.title,
+            contest_type: "LeetCode",
+            contest_phase: contest.past ? 1 : 0,
+            contest_date: format(adjustedStartTime, "dd MMM yyyy HH:mm:ss"),
+            contest_startTime: formatDistanceToNow(adjustedStartTime),
+            contest_origin: "leetcode",
+          });
+        });
+
+        skip += limit;
+      } while (totalResults === limit);
+    };
+
+    const fetchAll = async () => {
+      const promises = [];
+      if (type === "codechef" || type === "all") {
+        promises.push(fetchCodechef());
+      }
+      if (type === "codeforces" || type === "all") {
+        promises.push(fetchCodeforces());
+      }
+      if (type === "leetcode" || type === "all") {
+        promises.push(fetchLeetcode());
+      }
+      await Promise.all(promises);
+    };
+
+    await fetchAll();
 
     contests.sort(
       (a, b) => new Date(b.contest_date) - new Date(a.contest_date)
