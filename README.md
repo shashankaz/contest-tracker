@@ -1,36 +1,44 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Contest Tracker Documentation
 
-## Getting Started
+## Overview
+Contest Tracker is an online tool designed to help users easily manage and keep track of coding contests. It allows users to view upcoming contests, bookmark them, and access solutions for questions from competitive programming platforms.
 
-First, run the development server:
+## Tech Stack
+- **Frontend**: Next.js, React, Tailwind CSS
+- **Backend**: Node.js, Express
+- **Database**: MongoDB
+- **State Management**: Zustand
+- **HTTP Client**: Axios
+- **ODM (Object-Document Mapping)**: Mongoose
+- **Utilities**: date-fns, clsx, slugify
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+## Application Features
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### Routes
+- `/`: Displays all available contests in a table format with pagination. Each contest entry includes a bookmark feature and a link to solutions.
+- `/solution`: Lists all question-wise solutions. If a solution is unavailable, a form is provided to add solutions. Solutions are fetched from a YouTube playlist video description of respective platforms.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### Navbar Features
+- Dropdown menu to filter contests by platform: LeetCode, CodeChef, Codeforces, or all contests.
+- Bookmark toggle button to show or hide bookmarked contests.
+- Theme switcher to toggle between light and dark modes.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+### Responsive Design
+The UI is fully responsive, ensuring a seamless user experience across desktop, tablet, and mobile devices.
 
-## Learn More
+## API Endpoints
 
-To learn more about Next.js, take a look at the following resources:
+### Contest Data Endpoints
+- `GET /api/contest/{type}`: Retrieves contests based on the specified type (`all`, `leetcode`, `codechef`, or `codeforces`).
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+### Solution Data Endpoints
+- `GET /api/solution`: Fetches stored solutions from MongoDB.
+- `GET /api/solution/{title}`: Retrieves the solution for a given contest title. If not found, a form is displayed to submit a solution.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+### Platform-Specific Endpoints
+- `GET /api/codechef`: Lists YouTube playlist video metadata for CodeChef contests.
+- `GET /api/codechef/{title}`: If the contest title is present in the playlist, it extracts the links from the YouTube video description and returns them. Otherwise, it checks `/api/solution/{title}` and if not found, a form is displayed.
+- `GET /api/leetcode`: Lists YouTube playlist video metadata for LeetCode contests.
+- `GET /api/leetcode/{title}`: If the contest title is present in the playlist, it extracts the links from the YouTube video description and returns them. Otherwise, it checks `/api/solution/{title}` and if not found, a form is displayed.
+- `GET /api/codeforces`: Lists YouTube playlist video metadata for Codeforces contests.
+- `GET /api/codeforces/{title}`: If the contest title is present in the playlist, it extracts the links from the YouTube video description and returns them. Otherwise, it checks `/api/solution/{title}` and if not found, a form is displayed.
