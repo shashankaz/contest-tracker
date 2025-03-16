@@ -1,8 +1,8 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 import Solution from "@/models/Solution";
 import connectDB from "@/lib/db";
 
-export const POST = async (req: NextRequest) => {
+export const POST = async (req) => {
   const { title, videoUrl, links } = await req.json();
 
   try {
