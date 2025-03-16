@@ -60,8 +60,8 @@ const Home = () => {
   const fetchContest = async () => {
     try {
       setLoading(true);
-      const codeforcesResponse = await axios.get(`/api/contest/${platform}`);
-      setContest(codeforcesResponse.data);
+      const response = await axios.get(`/api/contest/${platform}`);
+      setContest(response.data);
     } catch (error) {
       console.error(error);
     } finally {
@@ -159,16 +159,7 @@ const Home = () => {
               <SelectItem value="all">All</SelectItem>
               <SelectItem value="codeforces">Codeforces</SelectItem>
               <SelectItem value="codechef">Codechef</SelectItem>
-              <SelectItem
-                value="leetcode"
-                disabled
-                className="flex items-center"
-              >
-                Leetcode{" "}
-                <span className="text-xs bg-green-500 rounded-full py-0.5 px-2">
-                  Coming Soon!
-                </span>
-              </SelectItem>
+              <SelectItem value="leetcode">Leetcode</SelectItem>
             </SelectContent>
           </Select>
           <Button onClick={() => setShowBookmarked(!showBookmarked)}>
