@@ -1,6 +1,10 @@
 import { NextResponse } from "next/server";
+import { createClient } from "redis";
 import Solution from "@/models/Solution";
 import connectDB from "@/lib/db";
+
+const redis = createClient({ url: process.env.REDIS_URL });
+await redis.connect();
 
 export const POST = async (req) => {
   const { title, videoUrl, links } = await req.json();
@@ -28,7 +32,17 @@ export const GET = async () => {
   try {
     await connectDB();
 
+    const cachedSolutions = await redis.get("solutions");
+    if (cachedSolutions) {
+      return NextResponse.json(
+        { solutions: JSON.parse(cachedSolutions) },
+        { status: 200 }
+      );
+    }
+
     const solutions = await Solution.find({});
+    await redis.set("solutions", JSON.stringify(solutions), { EX: 3600 });
+
     return NextResponse.json({ solutions }, { status: 200 });
   } catch (error) {
     console.error(error);
