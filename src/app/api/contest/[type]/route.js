@@ -7,6 +7,10 @@ import {
   addMinutes,
   addHours,
 } from "date-fns";
+import { createClient } from "redis";
+
+const redis = createClient({ url: process.env.REDIS_URL });
+await redis.connect();
 
 export const GET = async (req, { params }) => {
   let contests = [];
@@ -14,6 +18,13 @@ export const GET = async (req, { params }) => {
   const { type } = await params;
 
   try {
+    const cacheKey = `contests_${type}`;
+    const cachedData = await redis.get(cacheKey);
+
+    if (cachedData) {
+      return NextResponse.json(JSON.parse(cachedData), { status: 200 });
+    }
+
     const fetchCodechef = async () => {
       const response = await axios.get(
         "https://www.codechef.com/api/list/contests/all"
@@ -199,6 +210,10 @@ export const GET = async (req, { params }) => {
     contests.sort(
       (a, b) => new Date(b.contest_date) - new Date(a.contest_date)
     );
+
+    await redis.set(cacheKey, JSON.stringify(contests), {
+      EX: 3600,
+    });
 
     return NextResponse.json(contests, { status: 200 });
   } catch (error) {
