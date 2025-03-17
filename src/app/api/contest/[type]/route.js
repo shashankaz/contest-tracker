@@ -1,12 +1,6 @@
 import { NextResponse } from "next/server";
 import axios from "axios";
-import {
-  format,
-  formatDistanceToNow,
-  fromUnixTime,
-  addMinutes,
-  addHours,
-} from "date-fns";
+import { format, fromUnixTime, addMinutes, addHours } from "date-fns";
 import { createClient } from "redis";
 
 const redis = createClient({ url: process.env.REDIS_URL });
@@ -20,7 +14,7 @@ export const GET = async (req, { params }) => {
   const { type } = await params;
 
   try {
-    const cacheKey = `contests_${type}`;
+    const cacheKey = `contest_${type}`;
     const cachedData = await redis.get(cacheKey);
 
     if (cachedData) {
@@ -39,9 +33,7 @@ export const GET = async (req, { params }) => {
           contest_type: "CodeChef",
           contest_phase: contest.distinct_users,
           contest_date: contest.contest_start_date,
-          contest_startTime: formatDistanceToNow(
-            contest.contest_start_date_iso
-          ),
+          contest_startTime: contest.contest_start_date_iso,
           contest_origin: "codechef",
         });
       });
@@ -53,9 +45,7 @@ export const GET = async (req, { params }) => {
           contest_type: "CodeChef",
           contest_phase: contest.distinct_users,
           contest_date: contest.contest_start_date,
-          contest_startTime: formatDistanceToNow(
-            contest.contest_start_date_iso
-          ),
+          contest_startTime: contest.contest_start_date_iso,
           contest_origin: "codechef",
         });
       });
@@ -67,9 +57,7 @@ export const GET = async (req, { params }) => {
           contest_type: "CodeChef",
           contest_phase: contest.distinct_users,
           contest_date: contest.contest_start_date,
-          contest_startTime: formatDistanceToNow(
-            contest.contest_start_date_iso
-          ),
+          contest_startTime: contest.contest_start_date_iso,
           contest_origin: "codechef",
         });
       });
@@ -81,9 +69,7 @@ export const GET = async (req, { params }) => {
           contest_type: "CodeChef",
           contest_phase: contest.distinct_users,
           contest_date: contest.contest_start_date,
-          contest_startTime: formatDistanceToNow(
-            contest.contest_start_date_iso
-          ),
+          contest_startTime: contest.contest_start_date_iso,
           contest_origin: "codechef",
         });
       });
@@ -101,9 +87,7 @@ export const GET = async (req, { params }) => {
       //       contest_type: "CodeChef",
       //       contest_phase: contest.distinct_users,
       //       contest_date: contest.contest_start_date,
-      //       contest_startTime: formatDistanceToNow(
-      //         contest.contest_start_date_iso
-      //       ),
+      //       contest_startTime: contest.contest_start_date_iso,
       //       contest_origin: "codechef",
       //     });
       //   });
@@ -127,9 +111,7 @@ export const GET = async (req, { params }) => {
             contest_type: "CodeChef",
             contest_phase: contest.distinct_users,
             contest_date: contest.contest_start_date,
-            contest_startTime: formatDistanceToNow(
-              contest.contest_start_date_iso
-            ),
+            contest_startTime: contest.contest_start_date_iso,
             contest_origin: "codechef",
           });
         });
@@ -152,9 +134,7 @@ export const GET = async (req, { params }) => {
             "dd MMM yyyy HH:mm:ss",
             { timeZone: "Asia/Kolkata" }
           ),
-          contest_startTime: formatDistanceToNow(
-            fromUnixTime(contest.startTimeSeconds)
-          ),
+          contest_startTime: fromUnixTime(contest.startTimeSeconds),
           contest_origin: "codeforces",
         });
       });
@@ -184,7 +164,7 @@ export const GET = async (req, { params }) => {
             contest_type: "LeetCode",
             contest_phase: contest.past ? 1 : 0,
             contest_date: format(adjustedStartTime, "dd MMM yyyy HH:mm:ss"),
-            contest_startTime: formatDistanceToNow(adjustedStartTime),
+            contest_startTime: adjustedStartTime,
             contest_origin: "leetcode",
           });
         });
