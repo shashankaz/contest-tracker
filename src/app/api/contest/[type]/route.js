@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import axios from "axios";
-import { format, fromUnixTime, addMinutes, addHours } from "date-fns";
+import { format, addMinutes, addHours } from "date-fns";
 import { createClient } from "redis";
 
 const redis = createClient({ url: process.env.REDIS_URL });
@@ -14,7 +14,7 @@ export const GET = async (req, { params }) => {
   const { type } = await params;
 
   try {
-    const cacheKey = `contest_${type}`;
+    const cacheKey = `contests_${type}`;
     const cachedData = await redis.get(cacheKey);
 
     if (cachedData) {
@@ -32,8 +32,8 @@ export const GET = async (req, { params }) => {
           contest_name: contest.contest_name,
           contest_type: "CodeChef",
           contest_phase: contest.distinct_users,
-          contest_date: contest.contest_start_date,
-          contest_startTime: contest.contest_start_date_iso,
+          contest_date_start: contest.contest_start_date,
+          contest_date_end: contest.contest_end_date,
           contest_origin: "codechef",
         });
       });
@@ -44,8 +44,8 @@ export const GET = async (req, { params }) => {
           contest_name: contest.contest_name,
           contest_type: "CodeChef",
           contest_phase: contest.distinct_users,
-          contest_date: contest.contest_start_date,
-          contest_startTime: contest.contest_start_date_iso,
+          contest_date_start: contest.contest_start_date,
+          contest_date_end: contest.contest_end_date,
           contest_origin: "codechef",
         });
       });
@@ -56,8 +56,8 @@ export const GET = async (req, { params }) => {
           contest_name: contest.contest_name,
           contest_type: "CodeChef",
           contest_phase: contest.distinct_users,
-          contest_date: contest.contest_start_date,
-          contest_startTime: contest.contest_start_date_iso,
+          contest_date_start: contest.contest_start_date,
+          contest_date_end: contest.contest_end_date,
           contest_origin: "codechef",
         });
       });
@@ -68,8 +68,8 @@ export const GET = async (req, { params }) => {
           contest_name: contest.contest_name,
           contest_type: "CodeChef",
           contest_phase: contest.distinct_users,
-          contest_date: contest.contest_start_date,
-          contest_startTime: contest.contest_start_date_iso,
+          contest_date_start: contest.contest_start_date,
+          contest_date_end: contest.contest_end_date,
           contest_origin: "codechef",
         });
       });
@@ -86,8 +86,8 @@ export const GET = async (req, { params }) => {
       //       contest_name: contest.contest_name,
       //       contest_type: "CodeChef",
       //       contest_phase: contest.distinct_users,
-      //       contest_date: contest.contest_start_date,
-      //       contest_startTime: contest.contest_start_date_iso,
+      //       contest_date_start: contest.contest_start_date,
+      //       contest_date_end: contest.contest_end_date,
       //       contest_origin: "codechef",
       //     });
       //   });
@@ -110,8 +110,8 @@ export const GET = async (req, { params }) => {
             contest_name: contest.contest_name,
             contest_type: "CodeChef",
             contest_phase: contest.distinct_users,
-            contest_date: contest.contest_start_date,
-            contest_startTime: contest.contest_start_date_iso,
+            contest_date_start: contest.contest_start_date,
+            contest_date_end: contest.contest_end_date,
             contest_origin: "codechef",
           });
         });
@@ -129,12 +129,18 @@ export const GET = async (req, { params }) => {
           contest_name: contest.name,
           contest_type: contest.type,
           contest_phase: contest.phase === "FINISHED" ? 1 : 0,
-          contest_date: format(
+          contest_date_start: format(
             new Date(contest.startTimeSeconds * 1000),
             "dd MMM yyyy HH:mm:ss",
             { timeZone: "Asia/Kolkata" }
           ),
-          contest_startTime: fromUnixTime(contest.startTimeSeconds),
+          contest_date_end: format(
+            new Date(
+              (contest.startTimeSeconds + contest.durationSeconds) * 1000
+            ),
+            "dd MMM yyyy HH:mm:ss",
+            { timeZone: "Asia/Kolkata" }
+          ),
           contest_origin: "codeforces",
         });
       });
@@ -158,13 +164,20 @@ export const GET = async (req, { params }) => {
             addHours(new Date(contest.startTime), 5),
             30
           );
+          const adjustedEndTime = addMinutes(
+            addHours(new Date(contest.endTime), 5),
+            30
+          );
           contests.push({
             contest_id: contest._id,
             contest_name: contest.title,
             contest_type: "LeetCode",
             contest_phase: contest.past ? 1 : 0,
-            contest_date: format(adjustedStartTime, "dd MMM yyyy HH:mm:ss"),
-            contest_startTime: adjustedStartTime,
+            contest_date_start: format(
+              adjustedStartTime,
+              "dd MMM yyyy HH:mm:ss"
+            ),
+            contest_date_end: format(adjustedEndTime, "dd MMM yyyy HH:mm:ss"),
             contest_origin: "leetcode",
           });
         });
@@ -190,7 +203,7 @@ export const GET = async (req, { params }) => {
     await fetchAll();
 
     contests.sort(
-      (a, b) => new Date(b.contest_date) - new Date(a.contest_date)
+      (a, b) => new Date(b.contest_date_start) - new Date(a.contest_date_start)
     );
 
     await redis.set(cacheKey, JSON.stringify(contests), {
