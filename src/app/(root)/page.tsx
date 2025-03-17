@@ -244,7 +244,15 @@ const Home = () => {
                     : "bg-red-300 dark:bg-red-700"
                 )}
               >
-                <TableCell>{contest.contest_type}</TableCell>
+                <TableCell className="flex gap-2 items-center">
+                  {contest.contest_type}
+                  {new Date() >= new Date(contest.contest_date_start) &&
+                    new Date() <= new Date(contest.contest_date_end) && (
+                      <span className="text-xs uppercase bg-white text-red-500 border border-red-500 px-3 py-0.5 rounded-2xl">
+                        Live
+                      </span>
+                    )}
+                </TableCell>
                 <TableCell>{contest.contest_name}</TableCell>
                 <TableCell>{contest.contest_date_start}</TableCell>
                 <TableCell>
@@ -257,8 +265,18 @@ const Home = () => {
                 </TableCell>
                 <TableCell>{contest.contest_date_end}</TableCell>
                 <TableCell>
-                  {formatDistanceToNow(new Date(contest.contest_date_start))}
-                  {contest.contest_phase < 1 ? " remaining" : " ago"}
+                  {contest.contest_phase < 1
+                    ? new Date() >= new Date(contest.contest_date_start) &&
+                      new Date() <= new Date(contest.contest_date_end)
+                      ? `${formatDistanceToNow(
+                          new Date(contest.contest_date_start)
+                        )} passed`
+                      : `${formatDistanceToNow(
+                          new Date(contest.contest_date_end)
+                        )} remaining`
+                    : `${formatDistanceToNow(
+                        new Date(contest.contest_date_start)
+                      )} ago`}
                 </TableCell>
                 <TableCell className="text-center">
                   <button
