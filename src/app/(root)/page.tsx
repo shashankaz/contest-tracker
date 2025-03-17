@@ -51,6 +51,8 @@ const Home = () => {
   const itemsPerPage = 10;
   const [liveUsers, setLiveUsers] = useState(0);
 
+  const [time, setTime] = useState(4);
+
   const { platform, setPlatform } = usePlatform();
 
   const router = useRouter();
@@ -150,6 +152,29 @@ const Home = () => {
     );
   }, [filteredContests, currentPage, itemsPerPage]);
 
+  useEffect(() => {
+    if (showBookmarked && paginatedContests.length === 0) {
+      const timer = setTimeout(() => {
+        setShowBookmarked(false);
+        setPlatform("all");
+        setTime(4);
+      }, 4000);
+
+      const countdown = setInterval(() => {
+        setTime((prevTime) => prevTime - 1);
+      }, 1000);
+
+      return () => {
+        clearTimeout(timer);
+        clearInterval(countdown);
+      };
+    }
+  }, [showBookmarked, paginatedContests.length, setPlatform]);
+
+  useEffect(() => {
+    setTime(4);
+  }, [showBookmarked]);
+
   if (loading) {
     return (
       <div className="flex flex-col items-center justify-center h-screen">
@@ -214,131 +239,141 @@ const Home = () => {
         </div>
       )}
 
-      <Table>
-        <TableCaption>
-          Contest List{" "}
-          <span className="text-xs text-gray-500">
-            (Last updated: {new Date().toLocaleString()} IST, all times in IST)
-          </span>
-        </TableCaption>
-        <TableHeader>
-          <TableRow>
-            <TableHead>Type/Platform</TableHead>
-            <TableHead>Contest Name</TableHead>
-            <TableHead>Start Date & Time</TableHead>
-            <TableHead>Duration</TableHead>
-            <TableHead>End Date & Time</TableHead>
-            <TableHead>Time remaining/passed</TableHead>
-            <TableHead className="text-center">Save</TableHead>
-            <TableHead className="text-center">Solution</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {paginatedContests.map((contest) => {
-            return (
-              <TableRow
-                key={contest.contest_id}
-                className={cn(
-                  contest.contest_phase < 1
-                    ? "bg-green-300 dark:bg-green-700"
-                    : "bg-red-300 dark:bg-red-700"
-                )}
-              >
-                <TableCell className="flex gap-2 items-center">
-                  {contest.contest_type}
-                  {new Date() >= new Date(contest.contest_date_start) &&
-                    new Date() <= new Date(contest.contest_date_end) && (
-                      <span className="text-xs uppercase bg-white text-red-500 border border-red-500 px-3 py-0.5 rounded-2xl">
-                        Live
-                      </span>
-                    )}
-                </TableCell>
-                <TableCell>{contest.contest_name}</TableCell>
-                <TableCell>{contest.contest_date_start}</TableCell>
-                <TableCell>
-                  {Math.abs(
-                    new Date(contest.contest_date_end).getTime() -
-                      new Date(contest.contest_date_start).getTime()
-                  ) /
-                    (1000 * 60 * 60)}{" "}
-                  hours
-                </TableCell>
-                <TableCell>{contest.contest_date_end}</TableCell>
-                <TableCell>
-                  {contest.contest_phase < 1
-                    ? new Date() >= new Date(contest.contest_date_start) &&
-                      new Date() <= new Date(contest.contest_date_end)
-                      ? `${formatDistanceToNow(
-                          new Date(contest.contest_date_start)
-                        )} passed`
+      {paginatedContests.length > 0 ? (
+        <Table>
+          <TableCaption>
+            Contest List{" "}
+            <span className="text-xs text-gray-500">
+              (Last updated: {new Date().toLocaleString()} IST, all times in
+              IST)
+            </span>
+          </TableCaption>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Type/Platform</TableHead>
+              <TableHead>Contest Name</TableHead>
+              <TableHead>Start Date & Time</TableHead>
+              <TableHead>Duration</TableHead>
+              <TableHead>End Date & Time</TableHead>
+              <TableHead>Time remaining/passed</TableHead>
+              <TableHead className="text-center">Save</TableHead>
+              <TableHead className="text-center">Solution</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {paginatedContests.map((contest) => {
+              return (
+                <TableRow
+                  key={contest.contest_id}
+                  className={cn(
+                    contest.contest_phase < 1
+                      ? "bg-green-300 dark:bg-green-700"
+                      : "bg-red-300 dark:bg-red-700"
+                  )}
+                >
+                  <TableCell className="flex gap-2 items-center">
+                    {contest.contest_type}
+                    {new Date() >= new Date(contest.contest_date_start) &&
+                      new Date() <= new Date(contest.contest_date_end) && (
+                        <span className="text-xs uppercase bg-white text-red-500 border border-red-500 px-3 py-0.5 rounded-2xl">
+                          Live
+                        </span>
+                      )}
+                  </TableCell>
+                  <TableCell>{contest.contest_name}</TableCell>
+                  <TableCell>{contest.contest_date_start}</TableCell>
+                  <TableCell>
+                    {Math.abs(
+                      new Date(contest.contest_date_end).getTime() -
+                        new Date(contest.contest_date_start).getTime()
+                    ) /
+                      (1000 * 60 * 60)}{" "}
+                    hours
+                  </TableCell>
+                  <TableCell>{contest.contest_date_end}</TableCell>
+                  <TableCell>
+                    {contest.contest_phase < 1
+                      ? new Date() >= new Date(contest.contest_date_start) &&
+                        new Date() <= new Date(contest.contest_date_end)
+                        ? `${formatDistanceToNow(
+                            new Date(contest.contest_date_start)
+                          )} passed`
+                        : `${formatDistanceToNow(
+                            new Date(contest.contest_date_end)
+                          )} remaining`
                       : `${formatDistanceToNow(
-                          new Date(contest.contest_date_end)
-                        )} remaining`
-                    : `${formatDistanceToNow(
-                        new Date(contest.contest_date_start)
-                      )} ago`}
-                </TableCell>
-                <TableCell className="text-center">
-                  <button
-                    onClick={() => handleBookmark(contest.contest_id)}
-                    title="Bookmark contest"
-                    className="hover:cursor-pointer"
-                  >
-                    {bookmarkedContests.includes(contest.contest_id) ? (
-                      <Image
-                        src="/unsave.png"
-                        height={100}
-                        width={100}
-                        alt="unsave"
-                        className="size-4 dark:invert"
-                      />
-                    ) : (
-                      <Image
-                        src="/save.png"
-                        height={100}
-                        width={100}
-                        alt="save"
-                        className="size-4 dark:invert"
-                      />
-                    )}
-                  </button>
-                </TableCell>
-                <TableCell className="text-center">
-                  <button
-                    onClick={() =>
-                      handleRedirect(
-                        contest.contest_origin,
-                        contest.contest_name,
-                        contest.contest_id
-                      )
-                    }
-                    disabled={contest.contest_phase === 0}
-                    className="hover:cursor-pointer disabled:hover:cursor-not-allowed flex items-center gap-1 justify-center w-full"
-                    title="View solution"
-                  >
-                    Visit <ExternalLink className="stroke-1 size-4" />
-                  </button>
-                </TableCell>
-              </TableRow>
-            );
-          })}
-        </TableBody>
-      </Table>
+                          new Date(contest.contest_date_start)
+                        )} ago`}
+                  </TableCell>
+                  <TableCell className="text-center">
+                    <button
+                      onClick={() => handleBookmark(contest.contest_id)}
+                      title="Bookmark contest"
+                      className="hover:cursor-pointer"
+                    >
+                      {bookmarkedContests.includes(contest.contest_id) ? (
+                        <Image
+                          src="/unsave.png"
+                          height={100}
+                          width={100}
+                          alt="unsave"
+                          className="size-4 dark:invert"
+                        />
+                      ) : (
+                        <Image
+                          src="/save.png"
+                          height={100}
+                          width={100}
+                          alt="save"
+                          className="size-4 dark:invert"
+                        />
+                      )}
+                    </button>
+                  </TableCell>
+                  <TableCell className="text-center">
+                    <button
+                      onClick={() =>
+                        handleRedirect(
+                          contest.contest_origin,
+                          contest.contest_name,
+                          contest.contest_id
+                        )
+                      }
+                      disabled={contest.contest_phase === 0}
+                      className="hover:cursor-pointer disabled:hover:cursor-not-allowed flex items-center gap-1 justify-center w-full"
+                      title="View solution"
+                    >
+                      Visit <ExternalLink className="stroke-1 size-4" />
+                    </button>
+                  </TableCell>
+                </TableRow>
+              );
+            })}
+          </TableBody>
+        </Table>
+      ) : (
+        <span className="text-xl text-center">
+          No bookmarked contests found. Redirect in {time}{" "}
+          {time > 1 ? "seconds" : "second"}...
+        </span>
+      )}
 
-      <div className="flex justify-end my-4 gap-3">
-        <Button
-          onClick={() => handlePageChange(currentPage - 1)}
-          disabled={currentPage === 1}
-        >
-          Previous
-        </Button>
-        <Button
-          onClick={() => handlePageChange(currentPage + 1)}
-          disabled={currentPage >= totalPages}
-        >
-          Next
-        </Button>
-      </div>
+      {paginatedContests.length > 0 && (
+        <div className="flex justify-end my-4 gap-3">
+          <Button
+            onClick={() => handlePageChange(currentPage - 1)}
+            disabled={currentPage === 1}
+          >
+            Previous
+          </Button>
+          <Button
+            onClick={() => handlePageChange(currentPage + 1)}
+            disabled={currentPage >= totalPages}
+          >
+            Next
+          </Button>
+        </div>
+      )}
     </div>
   );
 };
