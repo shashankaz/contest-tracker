@@ -5,7 +5,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
 import axios from "axios";
-import { ChevronLeft, ExternalLink } from "lucide-react";
+import { ChevronLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -28,8 +28,10 @@ const extractCodechefLinks = (text: string): string[] => {
 };
 
 const extractLeetcodeLinks = (text: string): string[] => {
-  const regex = /https:\/\/leetcode\.com\/[a-z0-9-]+\/?/g;
-  return text.match(regex) || [];
+  const regex1 = /https:\/\/leetcode\.com\/[a-z0-9-]+(?:\/[a-z0-9-]+){4}\/?/g;
+  const regex2 = /https:\/\/leetcode\.com\/[a-z0-9-]+(?:\/[a-z0-9-]+){3}\/?/g;
+  const regex3 = /https:\/\/leetcode\.com\/[a-z0-9-]+(?:\/[a-z0-9-]+){2}\/?/g;
+  return text.match(regex1) || text.match(regex2) || text.match(regex3) || [];
 };
 
 const Solution = () => {
@@ -44,6 +46,13 @@ const Solution = () => {
 
   const router = useRouter();
 
+  const extractVideoId = (url: string) => {
+    const regex =
+      /(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/watch\?v=|youtu\.be\/)([a-zA-Z0-9_-]{11})/;
+    const match = url.match(regex);
+    return match ? match[1] : null;
+  };
+
   const fetchCodeforcesSolution = async () => {
     try {
       setLoading(true);
@@ -51,6 +60,7 @@ const Solution = () => {
       const data: Solution[] = await response.json();
 
       if (data.length > 0) {
+        setVideoUrl(data[0].videoUrl);
         setCurrentSolution({
           ...data[0],
           description: extractCodeforcesLinks(data[0].description).join("\n"),
@@ -60,6 +70,7 @@ const Solution = () => {
         const data: Solution[] = await response.json();
 
         if (data.length > 0) {
+          setVideoUrl(data[0].videoUrl);
           setCurrentSolution({
             ...data[0],
             description: data[0].links.join("\n"),
@@ -80,6 +91,7 @@ const Solution = () => {
       const data: Solution[] = await response.json();
 
       if (data.length > 0) {
+        setVideoUrl(data[0].videoUrl);
         setCurrentSolution({
           ...data[0],
           description: extractCodechefLinks(data[0].description).join("\n"),
@@ -89,6 +101,7 @@ const Solution = () => {
         const data: Solution[] = await response.json();
 
         if (data.length > 0) {
+          setVideoUrl(data[0].videoUrl);
           setCurrentSolution({
             ...data[0],
             description: data[0].links.join("\n"),
@@ -108,9 +121,8 @@ const Solution = () => {
       const response = await fetch(`/api/leetcode/${name}`);
       const data: Solution[] = await response.json();
 
-      console.log(data);
-
       if (data.length > 0) {
+        setVideoUrl(data[0].videoUrl);
         setCurrentSolution({
           ...data[0],
           description: extractLeetcodeLinks(data[0].description).join("\n"),
@@ -120,6 +132,7 @@ const Solution = () => {
         const data: Solution[] = await response.json();
 
         if (data.length > 0) {
+          setVideoUrl(data[0].videoUrl);
           setCurrentSolution({
             ...data[0],
             description: data[0].links.join("\n"),
@@ -199,32 +212,40 @@ const Solution = () => {
         </button>
         <p className="capitalize text-3xl font-medium">{type}</p>
       </div>
-      {!currentSolution && <p className="text-2xl font-medium mt-2">{name}</p>}
+      {!currentSolution && <p className="text-2xl font-medium mt-6">{name}</p>}
       {currentSolution ? (
         <div>
-          <Link
-            href={currentSolution.videoUrl}
-            target="_blank"
-            className="text-2xl font-medium mt-6 hover:underline flex items-center gap-2"
-            title="Watch video"
-          >
-            {name}
-            <ExternalLink className="size-6 hidden sm:block" />
-          </Link>
+          <h1 className="text-2xl font-medium mt-6">{name}</h1>
+          <div className="w-full lg:w-1/2 h-[220px] sm:h-[340px] md:h-[530px] lg:h-[380px] mt-4">
+            {videoUrl && (
+              <iframe
+                src={`https://www.youtube.com/embed/${extractVideoId(
+                  videoUrl
+                )}`}
+                title={currentSolution.title}
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                className="h-full w-full"
+              ></iframe>
+            )}
+          </div>
+          <h3 className="mt-3 text-xl font-medium">Solution Links</h3>
           <ul className="mt-3 list-decimal list-inside space-y-0.5">
             {currentSolution.description ? (
-              currentSolution.description.split("\n").map((link, index) => (
-                <li key={index}>
-                  <Link
-                    href={link}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="hover:underline font-medium"
-                  >
-                    Problem {String.fromCharCode(65 + index)} Solution
-                  </Link>
-                </li>
-              ))
+              currentSolution.description.split("\n").map(
+                (link, index) =>
+                  link && (
+                    <li key={index}>
+                      <Link
+                        href={link}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="hover:underline font-medium"
+                      >
+                        Problem {String.fromCharCode(65 + index)} Solution
+                      </Link>
+                    </li>
+                  )
+              )
             ) : (
               <p className="text-lg mt-2">
                 No solutions found. Add a solution for this problem.
