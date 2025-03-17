@@ -3,13 +3,7 @@
 import { useEffect, useState, useMemo } from "react";
 import Image from "next/image";
 import axios from "axios";
-import {
-  Bookmark,
-  BookmarkCheck,
-  ExternalLink,
-  Eye,
-  SquareChevronLeft,
-} from "lucide-react";
+import { ExternalLink, Eye, SquareChevronLeft } from "lucide-react";
 
 import {
   Table,
@@ -41,8 +35,8 @@ interface Contest {
   contest_name: string;
   contest_type: string;
   contest_phase: number;
-  contest_date: string;
-  contest_startTime: string;
+  contest_date_start: string;
+  contest_date_end: string;
   contest_origin: string;
 }
 
@@ -229,12 +223,14 @@ const Home = () => {
         </TableCaption>
         <TableHeader>
           <TableRow>
-            <TableHead>Type</TableHead>
-            <TableHead>ID</TableHead>
-            <TableHead>Name</TableHead>
-            <TableHead>Date</TableHead>
+            <TableHead>Type/Platform</TableHead>
+            <TableHead>Contest Name</TableHead>
+            <TableHead>Start Date & Time</TableHead>
+            <TableHead>Duration</TableHead>
+            <TableHead>End Date & Time</TableHead>
             <TableHead>Time remaining/passed</TableHead>
-            <TableHead>Options</TableHead>
+            <TableHead className="text-center">Save</TableHead>
+            <TableHead className="text-center">Solution</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -249,28 +245,47 @@ const Home = () => {
                 )}
               >
                 <TableCell>{contest.contest_type}</TableCell>
-                <TableCell>
-                  {contest.contest_origin === "leetcode"
-                    ? contest.contest_name.split(" ")[0]
-                    : contest.contest_id}
-                </TableCell>
                 <TableCell>{contest.contest_name}</TableCell>
-                <TableCell>{contest.contest_date}</TableCell>
+                <TableCell>{contest.contest_date_start}</TableCell>
                 <TableCell>
-                  {formatDistanceToNow(contest.contest_startTime)}
+                  {Math.abs(
+                    new Date(contest.contest_date_end).getTime() -
+                      new Date(contest.contest_date_start).getTime()
+                  ) /
+                    (1000 * 60 * 60)}{" "}
+                  hours
+                </TableCell>
+                <TableCell>{contest.contest_date_end}</TableCell>
+                <TableCell>
+                  {formatDistanceToNow(new Date(contest.contest_date_start))}
                   {contest.contest_phase < 1 ? " remaining" : " ago"}
                 </TableCell>
-                <TableCell className="flex gap-3 justify-center items-center bg-blue-300 dark:bg-blue-700 h-full">
+                <TableCell className="text-center">
                   <button
                     onClick={() => handleBookmark(contest.contest_id)}
                     title="Bookmark contest"
+                    className="hover:cursor-pointer"
                   >
                     {bookmarkedContests.includes(contest.contest_id) ? (
-                      <BookmarkCheck className="stroke-1" />
+                      <Image
+                        src="/unsave.png"
+                        height={100}
+                        width={100}
+                        alt="unsave"
+                        className="size-4 dark:invert"
+                      />
                     ) : (
-                      <Bookmark className="stroke-1" />
+                      <Image
+                        src="/save.png"
+                        height={100}
+                        width={100}
+                        alt="save"
+                        className="size-4 dark:invert"
+                      />
                     )}
                   </button>
+                </TableCell>
+                <TableCell className="text-center">
                   <button
                     onClick={() =>
                       handleRedirect(
@@ -279,10 +294,10 @@ const Home = () => {
                       )
                     }
                     disabled={contest.contest_phase === 0}
-                    className="hover:cursor-pointer disabled:hover:cursor-not-allowed"
+                    className="hover:cursor-pointer disabled:hover:cursor-not-allowed flex items-center gap-1 justify-center w-full"
                     title="View solution"
                   >
-                    <ExternalLink className="stroke-1" />
+                    Visit <ExternalLink className="stroke-1 size-4" />
                   </button>
                 </TableCell>
               </TableRow>
