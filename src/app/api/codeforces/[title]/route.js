@@ -3,7 +3,9 @@ import slugify from "slugify";
 import { createClient } from "redis";
 
 const redis = createClient({ url: process.env.REDIS_URL });
-await redis.connect();
+(async () => {
+  await redis.connect();
+})();
 
 export const GET = async (request, { params }) => {
   const API_KEY = process.env.API_KEY;
@@ -23,7 +25,9 @@ export const GET = async (request, { params }) => {
   }
 
   try {
-    const cachedData = await redis.get("playlistVideosCodeforces");
+    const cacheKey = `playlist_videos_${PLAYLIST_ID}`;
+    const cachedData = await redis.get(cacheKey);
+
     let videos;
     if (cachedData) {
       videos = JSON.parse(cachedData);
@@ -49,7 +53,7 @@ export const GET = async (request, { params }) => {
 
       videos = await getPlaylistVideos();
 
-      await redis.set("playlistVideosCodeforces", JSON.stringify(videos), {
+      await redis.set(cacheKey, JSON.stringify(videos), {
         EX: 3600,
       });
     }
