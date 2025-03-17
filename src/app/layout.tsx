@@ -18,7 +18,6 @@ export const metadata: Metadata = {
   description: "Track upcoming contests on Codeforces, Codechef, and Leetcode",
   keywords:
     "programming contests, Codeforces, Codechef, Leetcode, competitive programming, coding competitions, hackathons, online contests, programming challenges, coding events",
-  viewport: "width=device-width, initial-scale=1.0",
   robots: "index, follow",
 };
 
@@ -39,7 +38,6 @@ export default function RootLayout({
           content="programming contests, Codeforces, Codechef, Leetcode, competitive programming, coding competitions, hackathons, online contests, programming challenges, coding events"
         />
         <meta name="author" content="Contest Tracker Team" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <meta name="robots" content="index, follow" />
       </head>
       <body
