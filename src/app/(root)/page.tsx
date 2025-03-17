@@ -107,8 +107,8 @@ const Home = () => {
     };
   }, []);
 
-  const handleRedirect = (origin: string, name: string) => {
-    router.push(`/solution/?type=${origin}&name=${name}`);
+  const handleRedirect = (origin: string, name: string, id: string) => {
+    router.push(`/solution/?type=${origin}&name=${name}&id=${id}`);
   };
 
   const handleBookmark = (id: string) => {
@@ -308,7 +308,8 @@ const Home = () => {
                     onClick={() =>
                       handleRedirect(
                         contest.contest_origin,
-                        contest.contest_name
+                        contest.contest_name,
+                        contest.contest_id
                       )
                     }
                     disabled={contest.contest_phase === 0}
