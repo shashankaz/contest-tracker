@@ -5,7 +5,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
 import axios from "axios";
-import { ChevronLeft } from "lucide-react";
+import { ChevronLeft, ExternalLink } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -43,6 +43,7 @@ const Solution = () => {
   const searchParams = useSearchParams();
   const type = searchParams.get("type");
   const name = searchParams.get("name");
+  const id = searchParams.get("id");
 
   const router = useRouter();
 
@@ -228,6 +229,25 @@ const Solution = () => {
               ></iframe>
             )}
           </div>
+          <Link
+            href={
+              type === "leetcode"
+                ? `https://leetcode.com/contest/${name
+                    ?.split(" ")
+                    .join("-")
+                    .toLocaleLowerCase()}`
+                : type === "codeforces"
+                ? `https://codeforces.com/contest/${id}`
+                : type === "codechef"
+                ? `https://www.codechef.com/${id}`
+                : ""
+            }
+            target="_blank"
+            className="text-xl font-medium mt-4 flex items-center gap-2"
+          >
+            Visit Contest
+            <ExternalLink className="size-4" />
+          </Link>
           <h3 className="mt-3 text-xl font-medium">Solution Links</h3>
           <ul className="mt-3 list-decimal list-inside space-y-0.5">
             {currentSolution.description ? (
