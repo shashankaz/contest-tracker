@@ -34,6 +34,7 @@ import { Button } from "@/components/ui/button";
 import OverLay from "@/components/OverLay";
 import { usePlatform } from "@/store/useStore";
 import { io } from "socket.io-client";
+import { formatDistanceToNow } from "date-fns";
 
 interface Contest {
   contest_id: string;
@@ -74,6 +75,7 @@ const Home = () => {
 
   useEffect(() => {
     fetchContest();
+    setCurrentPage(1);
     const savedBookmarks = JSON.parse(
       localStorage.getItem("bookmarkedContests") || "[]"
     );
@@ -222,7 +224,7 @@ const Home = () => {
         <TableCaption>
           Contest List{" "}
           <span className="text-xs text-gray-500">
-            (Last updated: {new Date().toLocaleString()})
+            (Last updated: {new Date().toLocaleString()} IST, all times in IST)
           </span>
         </TableCaption>
         <TableHeader>
@@ -255,7 +257,7 @@ const Home = () => {
                 <TableCell>{contest.contest_name}</TableCell>
                 <TableCell>{contest.contest_date}</TableCell>
                 <TableCell>
-                  {contest.contest_startTime}
+                  {formatDistanceToNow(contest.contest_startTime)}
                   {contest.contest_phase < 1 ? " remaining" : " ago"}
                 </TableCell>
                 <TableCell className="flex gap-3 justify-center items-center bg-blue-300 dark:bg-blue-700 h-full">
