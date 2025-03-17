@@ -194,7 +194,7 @@ export const GET = async (req, { params }) => {
     );
 
     await redis.set(cacheKey, JSON.stringify(contests), {
-      EX: 3600,
+      EX: 900,
     });
 
     return NextResponse.json(contests, { status: 200 });

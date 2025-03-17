@@ -43,7 +43,7 @@ export const GET = async () => {
     }
 
     const solutions = await Solution.find({});
-    await redis.set("solutions", JSON.stringify(solutions), { EX: 3600 });
+    await redis.set("solutions", JSON.stringify(solutions), { EX: 900 });
 
     return NextResponse.json({ solutions }, { status: 200 });
   } catch (error) {

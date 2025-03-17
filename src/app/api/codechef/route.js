@@ -34,7 +34,7 @@ export const GET = async () => {
 
     const videos = await getPlaylistVideos();
 
-    await redis.set(cacheKey, JSON.stringify(videos), { EX: 3600 });
+    await redis.set(cacheKey, JSON.stringify(videos), { EX: 900 });
 
     return NextResponse.json(videos, { status: 200 });
   } catch (error) {
