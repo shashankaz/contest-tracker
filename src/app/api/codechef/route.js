@@ -2,7 +2,9 @@ import { NextResponse } from "next/server";
 import { createClient } from "redis";
 
 const redis = createClient({ url: process.env.REDIS_URL });
-await redis.connect();
+(async () => {
+  await redis.connect();
+})();
 
 export const GET = async () => {
   const API_KEY = process.env.API_KEY;

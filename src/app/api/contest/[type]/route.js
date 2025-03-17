@@ -10,7 +10,9 @@ import {
 import { createClient } from "redis";
 
 const redis = createClient({ url: process.env.REDIS_URL });
-await redis.connect();
+(async () => {
+  await redis.connect();
+})();
 
 export const GET = async (req, { params }) => {
   let contests = [];

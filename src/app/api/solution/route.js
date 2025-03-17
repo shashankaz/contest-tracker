@@ -4,7 +4,9 @@ import Solution from "@/models/Solution";
 import connectDB from "@/lib/db";
 
 const redis = createClient({ url: process.env.REDIS_URL });
-await redis.connect();
+(async () => {
+  await redis.connect();
+})();
 
 export const POST = async (req) => {
   const { title, videoUrl, links } = await req.json();
