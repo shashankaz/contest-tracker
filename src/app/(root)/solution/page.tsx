@@ -288,20 +288,20 @@ const Solution = () => {
               type="text"
               value={videoUrl}
               onChange={(e) => setVideoUrl(e.target.value)}
-              className="mt-2 w-[400px]"
+              className="mt-2 w-full md:w-[400px]"
             />
           </div>
           <div className="mt-2">
             <Label className="mb-2">Solution Links</Label>
             {solutionLinks.map((link, index) => (
-              <div key={index} className="flex items-center gap-2 mb-2">
+              <div key={index} className="flex items-center gap-3 mb-2">
                 <Input
                   type="text"
                   value={link}
                   onChange={(e) =>
                     handleSolutionLinkChange(index, e.target.value)
                   }
-                  className="w-[400px]"
+                  className="w-full md:w-[400px]"
                 />
                 {index === solutionLinks.length - 1 && (
                   <Button onClick={handleAddSolutionLink}>Add More</Button>
