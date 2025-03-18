@@ -124,23 +124,18 @@ export const GET = async (req, { params }) => {
       );
 
       response.data.result.forEach((contest) => {
+        const adjustedStartTime = new Date(contest.startTimeSeconds * 1000);
+        const adjustedEndTime = new Date(
+          (contest.startTimeSeconds + contest.durationSeconds) * 1000
+        );
+
         contests.push({
           contest_id: contest.id.toString(),
           contest_name: contest.name,
           contest_type: contest.type,
           contest_phase: contest.phase === "FINISHED" ? 1 : 0,
-          contest_date_start: format(
-            new Date(contest.startTimeSeconds * 1000),
-            "dd MMM yyyy HH:mm:ss",
-            { timeZone: "Asia/Kolkata" }
-          ),
-          contest_date_end: format(
-            new Date(
-              (contest.startTimeSeconds + contest.durationSeconds) * 1000
-            ),
-            "dd MMM yyyy HH:mm:ss",
-            { timeZone: "Asia/Kolkata" }
-          ),
+          contest_date_start: format(adjustedStartTime, "dd MMM yyyy HH:mm:ss"),
+          contest_date_end: format(adjustedEndTime, "dd MMM yyyy HH:mm:ss"),
           contest_origin: "codeforces",
         });
       });
