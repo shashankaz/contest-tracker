@@ -1,5 +1,4 @@
 import { NextResponse } from "next/server";
-import slugify from "slugify";
 import { createClient } from "redis";
 
 const redis = createClient({ url: process.env.REDIS_URL });
@@ -12,12 +11,8 @@ export const GET = async (request, { params }) => {
   const PLAYLIST_ID = "PLcXpkI9A-RZIZ6lsE0KCcLWeKNoG45fYr";
 
   const { title: name } = await params;
-  const modifiedName = slugify(name || "", {
-    lower: true,
-    remove: /[^\w\s-]/g,
-  });
 
-  if (!modifiedName) {
+  if (!name) {
     return NextResponse.json(
       { message: "Title parameter is required" },
       { status: 400 }
@@ -59,12 +54,7 @@ export const GET = async (request, { params }) => {
     }
 
     const filteredVideos = videos.filter((solution) => {
-      const modifiedTitle = solution.title.split(" | ")[0].slice(10);
-      const slugifiedTitle = slugify(modifiedTitle, {
-        lower: true,
-        remove: /[^\w\s-]/g,
-      });
-      return modifiedName.includes(slugifiedTitle);
+      return solution.title.split("|")[0].includes(name.split("(")[0]);
     });
 
     return NextResponse.json(filteredVideos, { status: 200 });
