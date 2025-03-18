@@ -29,6 +29,11 @@ export const GET = async () => {
         videoUrl: `https://www.youtube.com/watch?v=${video.snippet.resourceId.videoId}`,
       }));
 
+      if (data.nextPageToken) {
+        const nextPageVideos = await getPlaylistVideos(data.nextPageToken);
+        return [...videoDetails, ...nextPageVideos];
+      }
+
       return videoDetails;
     };
 
