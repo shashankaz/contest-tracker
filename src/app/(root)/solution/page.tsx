@@ -30,10 +30,9 @@ const extractCodechefLinks = (text: string): string[] => {
 };
 
 const extractLeetcodeLinks = (text: string): string[] => {
-  const regex1 = /https:\/\/leetcode\.com\/[a-z0-9-]+(?:\/[a-z0-9-]+){4}\/?/g;
-  const regex2 = /https:\/\/leetcode\.com\/[a-z0-9-]+(?:\/[a-z0-9-]+){3}\/?/g;
-  const regex3 = /https:\/\/leetcode\.com\/[a-z0-9-]+(?:\/[a-z0-9-]+){2}\/?/g;
-  return text.match(regex1) || text.match(regex2) || text.match(regex3) || [];
+  const regex1 = /https:\/\/leetcode\.com\/[^\s]+/g;
+  const regex2 = /https:\/\/ideone\.com\/[a-zA-Z0-9]+/g;
+  return text.match(regex1) || text.match(regex2) || [];
 };
 
 const Solution = () => {
