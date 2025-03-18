@@ -23,8 +23,10 @@ const extractCodeforcesLinks = (text: string): string[] => {
 };
 
 const extractCodechefLinks = (text: string): string[] => {
-  const regex = /https:\/\/www\.codechef\.com\/viewsolution\/\d+/g;
-  return text.match(regex) || [];
+  const regex1 = /https:\/\/www\.codechef\.com\/viewsolution\/\d+/g;
+  const regex2 = /https:\/\/pastebin\.com\/[a-zA-Z0-9]+/g;
+  const regex3 = /https:\/\/ideone\.com\/[a-zA-Z0-9]+/g;
+  return text.match(regex1) || text.match(regex2) || text.match(regex3) || [];
 };
 
 const extractLeetcodeLinks = (text: string): string[] => {
@@ -267,9 +269,7 @@ const Solution = () => {
                   )
               )
             ) : (
-              <p className="text-lg mt-2">
-                No solutions found. Add a solution for this problem.
-              </p>
+              <p className="text-lg mt-2">No solution links found.</p>
             )}
           </ul>
         </div>
