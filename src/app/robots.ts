@@ -9,6 +9,6 @@ export default function robots(): MetadataRoute.Robots {
         disallow: ["/private/"],
       },
     ],
-    sitemap: "https://contest-tracker-tau.vercel.app/sitemap.xml",
+    sitemap: "https://contest-tracker-hub.vercel.app/sitemap.xml",
   };
 }
