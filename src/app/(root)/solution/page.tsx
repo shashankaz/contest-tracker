@@ -6,9 +6,7 @@ import Link from "next/link";
 import Image from "next/image";
 import axios from "axios";
 import { ChevronLeft, ExternalLink } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import MissingSolutionForm from "@/components/MissingSolutionForm";
 
 interface Solution {
   title: string;
@@ -279,39 +277,14 @@ const Solution = () => {
       )}
 
       {!currentSolution && !loading && (
-        <div className="mt-4">
-          <h2 className="text-xl font-medium">Add Solution</h2>
-          <div className="mt-2">
-            <Label>Video URL</Label>
-            <Input
-              type="text"
-              value={videoUrl}
-              onChange={(e) => setVideoUrl(e.target.value)}
-              className="mt-2 w-full md:w-[400px]"
-            />
-          </div>
-          <div className="mt-2">
-            <Label className="mb-2">Solution Links</Label>
-            {solutionLinks.map((link, index) => (
-              <div key={index} className="flex items-center gap-3 mb-2">
-                <Input
-                  type="text"
-                  value={link}
-                  onChange={(e) =>
-                    handleSolutionLinkChange(index, e.target.value)
-                  }
-                  className="w-full md:w-[400px]"
-                />
-                {index === solutionLinks.length - 1 && (
-                  <Button onClick={handleAddSolutionLink}>Add More</Button>
-                )}
-              </div>
-            ))}
-          </div>
-          <Button onClick={handleSubmit} className="mt-4">
-            Submit
-          </Button>
-        </div>
+        <MissingSolutionForm
+          handleAddSolutionLink={handleAddSolutionLink}
+          handleSubmit={handleSubmit}
+          videoUrl={videoUrl}
+          setVideoUrl={setVideoUrl}
+          solutionLinks={solutionLinks}
+          handleSolutionLinkChange={handleSolutionLinkChange}
+        />
       )}
     </div>
   );
