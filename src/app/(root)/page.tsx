@@ -89,7 +89,7 @@ const Home = () => {
       } else {
         const response = await axios.get(`/api/contest/${platform}`);
         setContest(response.data);
-        setWithExpiry(`contests_${platform}`, response.data, 900000);
+        setWithExpiry(`contests_${platform}`, response.data, 600000); // 10 minutes
       }
     } catch (error) {
       console.error(error);
