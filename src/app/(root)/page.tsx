@@ -40,6 +40,29 @@ interface Contest {
   contest_origin: string;
 }
 
+const setWithExpiry = (key: string, value: Contest[], ttl: number) => {
+  const now = new Date();
+  const item = {
+    value: value,
+    expiry: now.getTime() + ttl,
+  };
+  localStorage.setItem(key, JSON.stringify(item));
+};
+
+const getWithExpiry = (key: string) => {
+  const itemStr = localStorage.getItem(key);
+  if (!itemStr) {
+    return null;
+  }
+  const item = JSON.parse(itemStr);
+  const now = new Date();
+  if (now.getTime() > item.expiry) {
+    localStorage.removeItem(key);
+    return null;
+  }
+  return item.value;
+};
+
 const Home = () => {
   const [contest, setContest] = useState<Contest[]>([]);
   const [loading, setLoading] = useState(true);
@@ -60,8 +83,14 @@ const Home = () => {
   const fetchContest = async () => {
     try {
       setLoading(true);
-      const response = await axios.get(`/api/contest/${platform}`);
-      setContest(response.data);
+      const cachedData = getWithExpiry(`contests_${platform}`);
+      if (cachedData) {
+        setContest(cachedData);
+      } else {
+        const response = await axios.get(`/api/contest/${platform}`);
+        setContest(response.data);
+        setWithExpiry(`contests_${platform}`, response.data, 900000);
+      }
     } catch (error) {
       console.error(error);
     } finally {
