@@ -10,17 +10,30 @@ Contest Tracker is an online tool designed to help users easily manage and keep 
 - **State Management**: Zustand
 - **HTTP Client**: Axios
 - **ODM (Object-Document Mapping)**: Mongoose
-- **Utilities**: date-fns, clsx, slugify
-- **Cache**: Redis
+- **Utilities**: date-fns, clsx
+- **Cache**: Redis, localStorage
 
 ## Demo Video
 
 You can watch the live demo of the application by clicking [here](https://www.loom.com/share/71d3203053d041ddbec9bc8c7aa87ac9?sid=b98d7396-dbe5-427b-b279-591605b109c8).
 
+## Live Preview
+
+The application is deployed on Vercel and can be accessed [here](https://contest-tracker-hub.vercel.app).
+
 ## Application Features
 
 ### Routes
-- `/`: Displays all available contests (both upcoming and past) in a table format with pagination. Each contest entry includes a bookmark feature and a link to solutions. The time remaining before a contest starts is also displayed for upcoming contests.
+- `/`: Displays all available contests (both upcoming and past) in a table format with pagination. Each contest entry includes the following columns:
+  - **Type/Platform**: The platform of the contest (e.g., LeetCode, CodeChef, Codeforces). A live mark is shown beside the type/platform for any live contest.
+  - **Contest Name**: The name of the contest.
+  - **Start Date & Time**: The start date and time of the contest.
+  - **Duration**: The duration of the contest.
+  - **End Date & Time**: The end date and time of the contest.
+  - **Time remaining/passed**: The time remaining before the contest starts or the time passed since it ended.
+  - **Save**: A bookmark feature to save the contest.
+  - **Solution**: A link to the solutions for the contest. The YouTube solution video is also embedded with the solution links.
+
 - `/solution`: Lists all question-wise solutions. If a solution is unavailable, a form is provided to add solutions. Solutions are fetched from a YouTube playlist video description of respective platforms, and if auto-fetching fails, a team member can manually attach the corresponding link.
 
 ### Navbar Features
@@ -30,6 +43,10 @@ You can watch the live demo of the application by clicking [here](https://www.lo
 
 ### Responsive Design
 The UI is fully responsive, ensuring a seamless user experience across desktop, tablet, and mobile devices.
+
+### Caching
+- Redis is used to cache frequently accessed contest lists, improving performance and reducing database load by minimizing the number of queries.
+- localStorage is used on the client side to cache contest data, reducing the need for repeated API calls and improving performance.
 
 ## API Endpoints
 
@@ -47,6 +64,3 @@ The UI is fully responsive, ensuring a seamless user experience across desktop, 
 - `GET /api/leetcode/{title}`: If the contest title is present in the playlist, it extracts the links from the YouTube video description and returns them. Otherwise, it checks `/api/solution/{title}` and if not found, a form is displayed where a team member can manually attach the solution link.
 - `GET /api/codeforces`: Lists YouTube playlist video metadata for Codeforces contests.
 - `GET /api/codeforces/{title}`: If the contest title is present in the playlist, it extracts the links from the YouTube video description and returns them. Otherwise, it checks `/api/solution/{title}` and if not found, a form is displayed where a team member can manually attach the solution link.
-
-### Caching
-- Redis is used to cache frequently accessed contest lists, improving performance and reducing database load by minimizing the number of queries.
