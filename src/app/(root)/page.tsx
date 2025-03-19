@@ -299,7 +299,7 @@ const Home = () => {
                             new Date(contest.contest_date_start)
                           )} passed`
                         : `${formatDistanceToNow(
-                            new Date(contest.contest_date_end)
+                            new Date(contest.contest_date_start)
                           )} remaining`
                       : `${formatDistanceToNow(
                           new Date(contest.contest_date_start)
