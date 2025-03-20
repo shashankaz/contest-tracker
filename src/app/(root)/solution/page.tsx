@@ -16,8 +16,17 @@ interface Solution {
 }
 
 const extractCodeforcesLinks = (text: string): string[] => {
-  const regex = /https:\/\/codeforces\.com\/contest\/\d+\/submission\/\d+/g;
-  return text.match(regex) || [];
+  const regex1 = /https:\/\/codeforces\.com\/contest\/\d+\/submission\/\d+/g;
+  const regex2 = /https:\/\/pastebin\.com\/[a-zA-Z0-9]+/g;
+  const regex3 = /https:\/\/ideone\.com\/[a-zA-Z0-9]+/g;
+  const regex4 = /https:\/\/hastebin\.com\/share\/[a-zA-Z0-9]+/g;
+  return (
+    text.match(regex1) ||
+    text.match(regex2) ||
+    text.match(regex3) ||
+    text.match(regex4) ||
+    []
+  );
 };
 
 const extractCodechefLinks = (text: string): string[] => {
