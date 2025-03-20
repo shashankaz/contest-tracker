@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import axios from "axios";
-import { format, addMinutes, addHours } from "date-fns";
+import { format } from "date-fns";
 import { createClient } from "redis";
 
 const redis = createClient({ url: process.env.REDIS_URL });
@@ -142,43 +142,43 @@ export const GET = async (req, { params }) => {
     };
 
     const fetchLeetcode = async () => {
-      let skip = 0;
-      const limit = 25;
-      let totalResults = 0;
+      const graphqlQuery = {
+        query: `
+          query {
+            allContests {
+              title
+              titleSlug
+              startTime
+              duration
+            }
+          }
+        `,
+      };
 
-      do {
-        const response = await axios.get(
-          `https://lccn.lbao.site/api/v1/contests/?skip=${skip}&limit=${limit}`
+      const response = await axios.post(
+        "https://leetcode.com/graphql",
+        JSON.stringify(graphqlQuery),
+        {
+          headers: { "Content-Type": "application/json" },
+        }
+      );
+
+      response.data.data.allContests.forEach((contest) => {
+        const adjustedStartTime = new Date(contest.startTime * 1000);
+        const adjustedEndTime = new Date(
+          (contest.startTime + contest.duration) * 1000
         );
 
-        totalResults = response.data.length;
-
-        // Total 214 responses till 16/03/2025
-        response.data.forEach((contest) => {
-          const adjustedStartTime = addMinutes(
-            addHours(new Date(contest.startTime), 5),
-            30
-          );
-          const adjustedEndTime = addMinutes(
-            addHours(new Date(contest.endTime), 5),
-            30
-          );
-          contests.push({
-            contest_id: contest._id,
-            contest_name: contest.title,
-            contest_type: "LeetCode",
-            contest_phase: contest.past ? 1 : 0,
-            contest_date_start: format(
-              adjustedStartTime,
-              "dd MMM yyyy HH:mm:ss"
-            ),
-            contest_date_end: format(adjustedEndTime, "dd MMM yyyy HH:mm:ss"),
-            contest_origin: "leetcode",
-          });
+        contests.push({
+          contest_id: Math.floor(Math.random() * 1000),
+          contest_name: contest.title,
+          contest_type: contest.title.split(" ")[0],
+          contest_phase: contest.startTime < Date.now() / 1000 ? 1 : 0,
+          contest_date_start: format(adjustedStartTime, "dd MMM yyyy HH:mm:ss"),
+          contest_date_end: format(adjustedEndTime, "dd MMM yyyy HH:mm:ss"),
+          contest_origin: "leetcode",
         });
-
-        skip += limit;
-      } while (totalResults === limit);
+      });
     };
 
     const fetchAll = async () => {
