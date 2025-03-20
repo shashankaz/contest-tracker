@@ -19,7 +19,7 @@ You can watch the live demo of the application by clicking [here](https://www.lo
 
 ## Live Preview
 
-The application is deployed on Vercel and can be accessed [here](https://contest-tracker-hub.vercel.app).
+The Contest Tracker application is deployed on Vercel and can be accessed [here](https://contest-tracker-hub.vercel.app).
 
 ## Application Features
 
@@ -34,7 +34,7 @@ The application is deployed on Vercel and can be accessed [here](https://contest
   - **Save**: A bookmark feature to save the contest.
   - **Solution**: A link to the solutions for the contest. The YouTube solution video is also embedded with the solution links.
 
-- `/solution`: Lists all question-wise solutions. If a solution is unavailable, a form is provided to add solutions. Solutions are fetched from a YouTube playlist video description of respective platforms, and if auto-fetching fails, a team member can manually attach the corresponding link.
+- `/solution/?type=${platform}&name=${contestName}&id=${contestId}`: Lists all question-wise solutions. If a solution is unavailable, a form is provided to add solutions. Solutions are fetched from a YouTube playlist video description of respective platforms, and if auto-fetching fails, a team member can manually attach the corresponding link.
 
 ### Navbar Features
 - Dropdown menu to filter contests by platform: LeetCode, CodeChef, Codeforces, or all contests.
