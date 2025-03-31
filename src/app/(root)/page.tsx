@@ -27,6 +27,7 @@ import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import OverLay from "@/components/OverLay";
 import { usePlatform } from "@/store/useStore";
+import Loading from "@/components/Loading";
 import { io } from "socket.io-client";
 import { formatDistanceToNow } from "date-fns";
 
@@ -205,20 +206,7 @@ const Home = () => {
   }, [showBookmarked]);
 
   if (loading) {
-    return (
-      <div className="flex flex-col items-center justify-center h-screen">
-        <Image
-          src="/loading.svg"
-          height={100}
-          width={100}
-          alt="Loading"
-          className="dark:invert"
-        />
-        <h1 className="text-lg mt-3 font-medium text-center">
-          Please wait, fetching contest details...
-        </h1>
-      </div>
-    );
+    return <Loading />;
   }
 
   return (
