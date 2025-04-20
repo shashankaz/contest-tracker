@@ -74,6 +74,7 @@ const Home = () => {
   const { platform, setPlatform } = usePlatform();
   const [search, setSearch] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
+  const [userVisits, setUserVisits] = useState(0);
 
   const debouncedSearchHandler = useMemo(
     () =>
@@ -156,8 +157,16 @@ const Home = () => {
     }
   };
 
+  const fetchVisits = async () => {
+    const response = await axios.get(
+      `${process.env.NEXT_PUBLIC_API_URL}/api/unique-users`
+    );
+    setUserVisits(response.data.userCount);
+  };
+
   useEffect(() => {
     fetchContest();
+    fetchVisits();
     const savedBookmarks = JSON.parse(
       localStorage.getItem("bookmarkedContests") || "[]"
     );
@@ -251,245 +260,276 @@ const Home = () => {
   }
 
   return (
-    <div>
-      <div className="flex items-center justify-between h-20">
-        <h1 className="text-3xl md:text-4xl font-semibold">Contest Tracker</h1>
-        <div className="hidden md:flex items-center justify-end gap-3">
-          <div className="relative">
-            <Input
-              placeholder="Search Contest"
-              value={search}
-              onChange={handleSearchChange}
-              className="pl-9"
-            />
-            <Search className="size-4 absolute top-1/2 -translate-1/2 left-5 text-gray-400" />
+    <div className="flex flex-col justify-between min-h-screen">
+      <div>
+        <div className="flex items-center justify-between h-20">
+          <h1 className="text-3xl md:text-4xl font-semibold">
+            Contest Tracker
+          </h1>
+          <div className="hidden md:flex items-center justify-end gap-3">
+            <div className="relative">
+              <Input
+                placeholder="Search Contest"
+                value={search}
+                onChange={handleSearchChange}
+                className="pl-9"
+              />
+              <Search className="size-4 absolute top-1/2 -translate-1/2 left-5 text-gray-400" />
+            </div>
+            <Select
+              value={platform}
+              onValueChange={(value: "codeforces" | "codechef" | "leetcode") =>
+                setPlatform(value)
+              }
+            >
+              <SelectTrigger className="sm:w-[180px]">
+                <SelectValue placeholder="Select Platform" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="codeforces">Codeforces</SelectItem>
+                <SelectItem value="codechef">Codechef</SelectItem>
+                <SelectItem value="leetcode">Leetcode</SelectItem>
+              </SelectContent>
+            </Select>
+            <Button onClick={() => setShowBookmarked(!showBookmarked)}>
+              {showBookmarked ? "Show All" : "Show Bookmarked"}
+            </Button>
+            <Button variant="secondary" title="Live users">
+              <Eye /> {liveUsers}
+            </Button>
+            <ModeToggle />
           </div>
-          <Select
-            value={platform}
-            onValueChange={(value: "codeforces" | "codechef" | "leetcode") =>
-              setPlatform(value)
-            }
-          >
-            <SelectTrigger className="sm:w-[180px]">
-              <SelectValue placeholder="Select Platform" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="codeforces">Codeforces</SelectItem>
-              <SelectItem value="codechef">Codechef</SelectItem>
-              <SelectItem value="leetcode">Leetcode</SelectItem>
-            </SelectContent>
-          </Select>
-          <Button onClick={() => setShowBookmarked(!showBookmarked)}>
-            {showBookmarked ? "Show All" : "Show Bookmarked"}
-          </Button>
-          <Button variant="secondary" title="Live users">
-            <Eye /> {liveUsers}
-          </Button>
-          <ModeToggle />
+          <button className="flex md:hidden" onClick={() => setOpen(true)}>
+            <SquareChevronLeft />
+          </button>
         </div>
-        <button className="flex md:hidden" onClick={() => setOpen(true)}>
-          <SquareChevronLeft />
-        </button>
-      </div>
-
-      {open && (
-        <div className="fixed inset-0 bg-black/50 z-10">
-          <OverLay
-            setOpen={setOpen}
-            showBookmarked={showBookmarked}
-            setShowBookmarked={setShowBookmarked}
-            platform={platform}
-            setPlatform={setPlatform}
-            liveUsers={liveUsers}
-            search={search}
-            handleSearchChange={handleSearchChange}
-          />
-        </div>
-      )}
-
-      {filteredContests.length > 0 ? (
-        <Table>
-          <TableCaption>
-            Contest List{" "}
-            <span className="text-xs text-gray-500">
-              (Last updated:{" "}
-              {new Date(lastUpdatedAt).toLocaleString("en-US", {
-                year: "numeric",
-                month: "short",
-                day: "numeric",
-                hour: "2-digit",
-                minute: "2-digit",
-                timeZone: "IST",
-              })}{" "}
-              IST, all times in IST)
-            </span>
-          </TableCaption>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Type/Platform</TableHead>
-              <TableHead>Contest Name</TableHead>
-              <TableHead>Start Date & Time</TableHead>
-              <TableHead>Duration</TableHead>
-              <TableHead>End Date & Time</TableHead>
-              <TableHead>Time remaining/passed</TableHead>
-              <TableHead className="text-center">Save</TableHead>
-              <TableHead className="text-center">Contest</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {filteredContests.map((contest) => {
-              return (
-                <TableRow
-                  key={contest.contest_id}
-                  className={cn(
-                    contest.contest_phase < 1
-                      ? "bg-green-300 dark:bg-green-700"
-                      : "bg-red-300 dark:bg-red-700"
-                  )}
-                >
-                  <TableCell className="flex gap-2 items-center">
-                    {contest.contest_type}
-                    {new Date() >= new Date(contest.contest_date_start) &&
-                      new Date() <= new Date(contest.contest_date_end) && (
-                        <span className="text-xs uppercase bg-white text-red-500 border border-red-500 px-3 py-0.5 rounded-2xl">
-                          Live
-                        </span>
+        {open && (
+          <div className="fixed inset-0 bg-black/50 z-10">
+            <OverLay
+              setOpen={setOpen}
+              showBookmarked={showBookmarked}
+              setShowBookmarked={setShowBookmarked}
+              platform={platform}
+              setPlatform={setPlatform}
+              liveUsers={liveUsers}
+              search={search}
+              handleSearchChange={handleSearchChange}
+            />
+          </div>
+        )}
+        {filteredContests.length > 0 ? (
+          <Table>
+            <TableCaption>
+              Contest List{" "}
+              <span className="text-xs text-gray-500">
+                (Last updated:{" "}
+                {new Date(lastUpdatedAt).toLocaleString("en-US", {
+                  year: "numeric",
+                  month: "short",
+                  day: "numeric",
+                  hour: "2-digit",
+                  minute: "2-digit",
+                  timeZone: "IST",
+                })}{" "}
+                IST, all times in IST)
+              </span>
+            </TableCaption>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Type/Platform</TableHead>
+                <TableHead>Contest Name</TableHead>
+                <TableHead>Start Date & Time</TableHead>
+                <TableHead>Duration</TableHead>
+                <TableHead>End Date & Time</TableHead>
+                <TableHead>Time remaining/passed</TableHead>
+                <TableHead className="text-center">Save</TableHead>
+                <TableHead className="text-center">Contest</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {filteredContests.map((contest) => {
+                return (
+                  <TableRow
+                    key={contest.contest_id}
+                    className={cn(
+                      contest.contest_phase < 1
+                        ? "bg-green-300 dark:bg-green-700"
+                        : "bg-red-300 dark:bg-red-700"
+                    )}
+                  >
+                    <TableCell className="flex gap-2 items-center">
+                      {contest.contest_type}
+                      {new Date() >= new Date(contest.contest_date_start) &&
+                        new Date() <= new Date(contest.contest_date_end) && (
+                          <span className="text-xs uppercase bg-white text-red-500 border border-red-500 px-3 py-0.5 rounded-2xl">
+                            Live
+                          </span>
+                        )}
+                    </TableCell>
+                    <TableCell>{contest.contest_name}</TableCell>
+                    <TableCell>
+                      {new Date(contest.contest_date_start).toLocaleString(
+                        "en-US",
+                        {
+                          year: "numeric",
+                          month: "short",
+                          day: "numeric",
+                          hour: "2-digit",
+                          minute: "2-digit",
+                          timeZone: "IST",
+                        }
                       )}
-                  </TableCell>
-                  <TableCell>{contest.contest_name}</TableCell>
-                  <TableCell>
-                    {new Date(contest.contest_date_start).toLocaleString(
-                      "en-US",
-                      {
-                        year: "numeric",
-                        month: "short",
-                        day: "numeric",
-                        hour: "2-digit",
-                        minute: "2-digit",
-                        timeZone: "IST",
-                      }
-                    )}
-                  </TableCell>
-                  <TableCell>
-                    {Math.round(
-                      Math.abs(
-                        new Date(contest.contest_date_end).getTime() -
-                          new Date(contest.contest_date_start).getTime()
-                      ) /
-                        (1000 * 60 * 60)
-                    )}{" "}
-                    hours
-                  </TableCell>
-                  <TableCell>
-                    {new Date(contest.contest_date_end).toLocaleString(
-                      "en-US",
-                      {
-                        year: "numeric",
-                        month: "short",
-                        day: "numeric",
-                        hour: "2-digit",
-                        minute: "2-digit",
-                        timeZone: "IST",
-                      }
-                    )}
-                  </TableCell>
-                  <TableCell>
-                    {contest.contest_phase < 1
-                      ? new Date() >= new Date(contest.contest_date_start) &&
-                        new Date() <= new Date(contest.contest_date_end)
-                        ? `${formatDistanceToNow(
-                            new Date(contest.contest_date_start)
-                          )} passed`
+                    </TableCell>
+                    <TableCell>
+                      {Math.round(
+                        Math.abs(
+                          new Date(contest.contest_date_end).getTime() -
+                            new Date(contest.contest_date_start).getTime()
+                        ) /
+                          (1000 * 60 * 60)
+                      )}{" "}
+                      hours
+                    </TableCell>
+                    <TableCell>
+                      {new Date(contest.contest_date_end).toLocaleString(
+                        "en-US",
+                        {
+                          year: "numeric",
+                          month: "short",
+                          day: "numeric",
+                          hour: "2-digit",
+                          minute: "2-digit",
+                          timeZone: "IST",
+                        }
+                      )}
+                    </TableCell>
+                    <TableCell>
+                      {contest.contest_phase < 1
+                        ? new Date() >= new Date(contest.contest_date_start) &&
+                          new Date() <= new Date(contest.contest_date_end)
+                          ? `${formatDistanceToNow(
+                              new Date(contest.contest_date_start)
+                            )} passed`
+                          : `${formatDistanceToNow(
+                              new Date(contest.contest_date_start)
+                            )} remaining`
                         : `${formatDistanceToNow(
                             new Date(contest.contest_date_start)
-                          )} remaining`
-                      : `${formatDistanceToNow(
-                          new Date(contest.contest_date_start)
-                        )} ago`}
-                  </TableCell>
-                  <TableCell className="text-center">
-                    <button
-                      onClick={() => handleBookmark(contest.contest_id)}
-                      title="Bookmark contest"
-                      className="hover:cursor-pointer"
-                    >
-                      {bookmarkedContests.includes(contest.contest_id) ? (
-                        <Image
-                          src="/unsave.png"
-                          height={100}
-                          width={100}
-                          alt="unsave"
-                          className="size-4 dark:invert"
-                        />
-                      ) : (
-                        <Image
-                          src="/save.png"
-                          height={100}
-                          width={100}
-                          alt="save"
-                          className="size-4 dark:invert"
-                        />
-                      )}
-                    </button>
-                  </TableCell>
-                  <TableCell className="text-center">
-                    <Link
-                      href={contestLink(
-                        contest.contest_origin,
-                        contest.contest_id
-                      )}
-                      target="_blank"
-                      className="hover:cursor-pointer disabled:hover:cursor-not-allowed flex items-center gap-1 justify-center w-full"
-                    >
-                      Visit <ExternalLink className="stroke-1 size-4" />
-                    </Link>
-                  </TableCell>
-                </TableRow>
-              );
-            })}
-          </TableBody>
-        </Table>
-      ) : (
-        <div className="flex flex-col items-center justify-center py-10">
-          {showBookmarked ? (
-            <span className="text-xl text-center">
-              No bookmarked contests found. Redirect in {time}{" "}
-              {time > 1 ? "seconds" : "second"}...
-            </span>
-          ) : (
-            <span className="text-xl text-center">
-              No contests found for your search criteria. Try adjusting your
-              filters.
-            </span>
-          )}
-        </div>
-      )}
+                          )} ago`}
+                    </TableCell>
+                    <TableCell className="text-center">
+                      <button
+                        onClick={() => handleBookmark(contest.contest_id)}
+                        title="Bookmark contest"
+                        className="hover:cursor-pointer"
+                      >
+                        {bookmarkedContests.includes(contest.contest_id) ? (
+                          <Image
+                            src="/unsave.png"
+                            height={100}
+                            width={100}
+                            alt="unsave"
+                            className="size-4 dark:invert"
+                          />
+                        ) : (
+                          <Image
+                            src="/save.png"
+                            height={100}
+                            width={100}
+                            alt="save"
+                            className="size-4 dark:invert"
+                          />
+                        )}
+                      </button>
+                    </TableCell>
+                    <TableCell className="text-center">
+                      <Link
+                        href={contestLink(
+                          contest.contest_origin,
+                          contest.contest_id
+                        )}
+                        target="_blank"
+                        className="hover:cursor-pointer disabled:hover:cursor-not-allowed flex items-center gap-1 justify-center w-full"
+                      >
+                        Visit <ExternalLink className="stroke-1 size-4" />
+                      </Link>
+                    </TableCell>
+                  </TableRow>
+                );
+              })}
+            </TableBody>
+          </Table>
+        ) : (
+          <div className="flex flex-col items-center justify-center py-10">
+            {showBookmarked ? (
+              <span className="text-xl text-center">
+                No bookmarked contests found. Redirect in {time}{" "}
+                {time > 1 ? "seconds" : "second"}...
+              </span>
+            ) : (
+              <span className="text-xl text-center">
+                No contests found for your search criteria. Try adjusting your
+                filters.
+              </span>
+            )}
+          </div>
+        )}
+        {filteredContests.length > 0 && !showBookmarked && (
+          <div className="flex justify-end my-4 gap-3">
+            <Button
+              onClick={() => handlePageChange(pagination.page - 1)}
+              disabled={pagination.page === 1}
+            >
+              Previous
+            </Button>
+            <Button
+              onClick={() => handlePageChange(pagination.page + 1)}
+              disabled={pagination.page >= pagination.pages}
+            >
+              Next
+            </Button>
+          </div>
+        )}
+        {emailPopupOpen && (
+          <div className="h-screen fixed inset-0 flex items-center justify-center bg-black/50">
+            <Newsletter
+              setEmailPopupOpen={setEmailPopupOpen}
+              subscribeEmail={subscribeEmail}
+            />
+          </div>
+        )}
+      </div>
 
-      {filteredContests.length > 0 && !showBookmarked && (
-        <div className="flex justify-end my-4 gap-3">
-          <Button
-            onClick={() => handlePageChange(pagination.page - 1)}
-            disabled={pagination.page === 1}
-          >
-            Previous
-          </Button>
-          <Button
-            onClick={() => handlePageChange(pagination.page + 1)}
-            disabled={pagination.page >= pagination.pages}
-          >
-            Next
-          </Button>
+      <div>
+        <div className="flex flex-col items-center justify-center gap-2 md:gap-4 pt-4 text-sm md:text-base">
+          <h4 className="font-medium">Total Visits</h4>
+          <div>
+            {userVisits
+              .toString()
+              .split("")
+              .map((item, idx: number) => {
+                return (
+                  <span
+                    key={idx}
+                    className="bg-gray-200 dark:bg-gray-800 py-1 md:py-2 px-2 md:px-3 rounded-sm mx-1 dark:text-white font-medium"
+                  >
+                    {item}
+                  </span>
+                );
+              })}
+          </div>
         </div>
-      )}
-
-      {emailPopupOpen && (
-        <div className="h-screen fixed inset-0 flex items-center justify-center bg-black/50">
-          <Newsletter
-            setEmailPopupOpen={setEmailPopupOpen}
-            subscribeEmail={subscribeEmail}
-          />
-        </div>
-      )}
+        <p className="text-center py-4 md:py-6 text-sm md:text-base">
+          Made with ❤️ by{" "}
+          <Link
+            href="https://x.com/shashankaz"
+            target="_blank"
+            className="hover:underline"
+          >
+            Shashank
+          </Link>
+        </p>
+      </div>
     </div>
   );
 };
