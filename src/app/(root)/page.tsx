@@ -3,7 +3,12 @@
 import { useEffect, useState, useMemo } from "react";
 import Image from "next/image";
 import axios from "axios";
-import { ExternalLink, Eye, SquareChevronLeft } from "lucide-react";
+import { ExternalLink, Eye, Search, SquareChevronLeft } from "lucide-react";
+import { io } from "socket.io-client";
+import { formatDistanceToNow } from "date-fns";
+import Link from "next/link";
+import { debounce } from "lodash";
+import Cookies from "js-cookie";
 
 import {
   Table,
@@ -21,15 +26,16 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { ModeToggle } from "@/components/theme-toggle";
 import { cn } from "@/lib/utils";
-import { useRouter } from "next/navigation";
-import { Button } from "@/components/ui/button";
 import OverLay from "@/components/OverLay";
-import { usePlatform } from "@/store/useStore";
 import Loading from "@/components/Loading";
-import { io } from "socket.io-client";
-import { formatDistanceToNow } from "date-fns";
+import Newsletter from "@/components/Newsletter";
+import { usePlatform } from "@/store/useStore";
+
+axios.defaults.baseURL = process.env.NEXT_PUBLIC_API_URL;
 
 interface Contest {
   contest_id: string;
@@ -41,57 +47,95 @@ interface Contest {
   contest_origin: string;
 }
 
-const setWithExpiry = (key: string, value: Contest[], ttl: number) => {
-  const now = new Date();
-  const item = {
-    value: value,
-    expiry: now.getTime() + ttl,
-  };
-  localStorage.setItem(key, JSON.stringify(item));
-};
-
-const getWithExpiry = (key: string) => {
-  const itemStr = localStorage.getItem(key);
-  if (!itemStr) {
-    return null;
-  }
-  const item = JSON.parse(itemStr);
-  const now = new Date();
-  if (now.getTime() > item.expiry) {
-    localStorage.removeItem(key);
-    return null;
-  }
-  return item.value;
-};
+interface PaginationInfo {
+  total: number;
+  page: number;
+  pages: number;
+  limit: number;
+}
 
 const Home = () => {
   const [contest, setContest] = useState<Contest[]>([]);
   const [loading, setLoading] = useState(true);
-  const [currentPage, setCurrentPage] = useState(1);
   const [bookmarkedContests, setBookmarkedContests] = useState<string[]>([]);
   const [showBookmarked, setShowBookmarked] = useState(false);
-  // const [platform, setPlatform] = useState("all");
   const [open, setOpen] = useState(false);
-  const itemsPerPage = 10;
+  const [emailPopupOpen, setEmailPopupOpen] = useState(false);
   const [liveUsers, setLiveUsers] = useState(0);
-
   const [time, setTime] = useState(4);
+  const [pagination, setPagination] = useState<PaginationInfo>({
+    total: 0,
+    page: 1,
+    pages: 1,
+    limit: 10,
+  });
+  const [lastUpdatedAt, setLastUpdatedAt] = useState("");
 
   const { platform, setPlatform } = usePlatform();
+  const [search, setSearch] = useState("");
+  const [debouncedSearch, setDebouncedSearch] = useState("");
 
-  const router = useRouter();
+  const debouncedSearchHandler = useMemo(
+    () =>
+      debounce((value: string) => {
+        setDebouncedSearch(value);
+      }, 500),
+    []
+  );
 
-  const fetchContest = async () => {
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setSearch(value);
+    debouncedSearchHandler(value);
+  };
+
+  const updateCount = async () => {
+    try {
+      await axios.post("/api/unique-users");
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const subscribeEmail = async (email: string) => {
+    try {
+      await axios.post(`/api/newsletter/subscribe?email=${email}`);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  useEffect(() => {
+    const token = localStorage.getItem("visited");
+    if (!token) {
+      updateCount();
+      localStorage.setItem("visited", "true");
+    }
+  }, []);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      const isEmailSubscribed = Cookies.get("emailSubscribed");
+      if (!isEmailSubscribed) {
+        setEmailPopupOpen(true);
+        Cookies.set("emailSubscribed", "true");
+      }
+    }, 10000);
+
+    return () => {
+      clearTimeout(timer);
+    };
+  }, []);
+
+  const fetchContest = async (pageNumber = 1) => {
     try {
       setLoading(true);
-      const cachedData = getWithExpiry(`contests_${platform}`);
-      if (cachedData) {
-        setContest(cachedData);
-      } else {
-        const response = await axios.get(`/api/contest/${platform}`);
-        setContest(response.data);
-        setWithExpiry(`contests_${platform}`, response.data, 600000); // 10 minutes
-      }
+      const response = await axios.get(
+        `/api/contest/?page=${pageNumber}&limit=10&search=${debouncedSearch}&origin=${platform}`
+      );
+      setContest(response.data.contests);
+      setPagination(response.data.pagination);
+      setLastUpdatedAt(response.data.lastUpdatedAt);
     } catch (error) {
       console.error(error);
     } finally {
@@ -99,21 +143,33 @@ const Home = () => {
     }
   };
 
+  const contestLink = (platform: string, contest_id: string) => {
+    switch (platform) {
+      case "codeforces":
+        return `https://codeforces.com/contests/${contest_id}`;
+      case "codechef":
+        return `https://www.codechef.com/${contest_id}`;
+      case "leetcode":
+        return `https://leetcode.com/contest/${contest_id}`;
+      default:
+        return "";
+    }
+  };
+
   useEffect(() => {
     fetchContest();
-    setCurrentPage(1);
     const savedBookmarks = JSON.parse(
       localStorage.getItem("bookmarkedContests") || "[]"
     );
     setBookmarkedContests(savedBookmarks);
-  }, [platform]);
+  }, [platform, debouncedSearch]);
 
   useEffect(() => {
     setOpen(false);
   }, [platform, showBookmarked]);
 
   useEffect(() => {
-    const socketUrl = process.env.NEXT_PUBLIC_WEBSOCKETS_URL as string;
+    const socketUrl = process.env.NEXT_PUBLIC_API_URL as string;
     const socket = io(socketUrl);
 
     socket.on("connect", () => {
@@ -139,10 +195,6 @@ const Home = () => {
     };
   }, []);
 
-  const handleRedirect = (origin: string, name: string, id: string) => {
-    router.push(`/solution/?type=${origin}&name=${name}&id=${id}`);
-  };
-
   const handleBookmark = (id: string) => {
     let updatedBookmarks = [...bookmarkedContests];
     if (bookmarkedContests.includes(id)) {
@@ -160,7 +212,7 @@ const Home = () => {
   };
 
   const handlePageChange = (newPage: number) => {
-    setCurrentPage(newPage);
+    fetchContest(newPage);
   };
 
   const filteredContests = useMemo(() => {
@@ -171,22 +223,11 @@ const Home = () => {
       : contest;
   }, [showBookmarked, contest, bookmarkedContests]);
 
-  const totalPages = useMemo(() => {
-    return Math.ceil(filteredContests.length / itemsPerPage);
-  }, [filteredContests.length, itemsPerPage]);
-
-  const paginatedContests = useMemo(() => {
-    return filteredContests.slice(
-      (currentPage - 1) * itemsPerPage,
-      currentPage * itemsPerPage
-    );
-  }, [filteredContests, currentPage, itemsPerPage]);
-
   useEffect(() => {
-    if (showBookmarked && paginatedContests.length === 0) {
+    if (showBookmarked && filteredContests.length === 0) {
       const timer = setTimeout(() => {
         setShowBookmarked(false);
-        setPlatform("all");
+        setPlatform("");
         setTime(4);
       }, 4000);
 
@@ -199,7 +240,7 @@ const Home = () => {
         clearInterval(countdown);
       };
     }
-  }, [showBookmarked, paginatedContests.length, setPlatform]);
+  }, [showBookmarked, filteredContests.length, setPlatform]);
 
   useEffect(() => {
     setTime(4);
@@ -214,17 +255,25 @@ const Home = () => {
       <div className="flex items-center justify-between h-20">
         <h1 className="text-3xl md:text-4xl font-semibold">Contest Tracker</h1>
         <div className="hidden md:flex items-center justify-end gap-3">
+          <div className="relative">
+            <Input
+              placeholder="Search Contest"
+              value={search}
+              onChange={handleSearchChange}
+              className="pl-9"
+            />
+            <Search className="size-4 absolute top-1/2 -translate-1/2 left-5 text-gray-400" />
+          </div>
           <Select
             value={platform}
-            onValueChange={(
-              value: "all" | "codeforces" | "codechef" | "leetcode"
-            ) => setPlatform(value)}
+            onValueChange={(value: "codeforces" | "codechef" | "leetcode") =>
+              setPlatform(value)
+            }
           >
             <SelectTrigger className="sm:w-[180px]">
               <SelectValue placeholder="Select Platform" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">All</SelectItem>
               <SelectItem value="codeforces">Codeforces</SelectItem>
               <SelectItem value="codechef">Codechef</SelectItem>
               <SelectItem value="leetcode">Leetcode</SelectItem>
@@ -252,17 +301,27 @@ const Home = () => {
             platform={platform}
             setPlatform={setPlatform}
             liveUsers={liveUsers}
+            search={search}
+            handleSearchChange={handleSearchChange}
           />
         </div>
       )}
 
-      {paginatedContests.length > 0 ? (
+      {filteredContests.length > 0 ? (
         <Table>
           <TableCaption>
             Contest List{" "}
             <span className="text-xs text-gray-500">
-              (Last updated: {new Date().toLocaleString()} IST, all times in
-              IST)
+              (Last updated:{" "}
+              {new Date(lastUpdatedAt).toLocaleString("en-US", {
+                year: "numeric",
+                month: "short",
+                day: "numeric",
+                hour: "2-digit",
+                minute: "2-digit",
+                timeZone: "IST",
+              })}{" "}
+              IST, all times in IST)
             </span>
           </TableCaption>
           <TableHeader>
@@ -274,11 +333,11 @@ const Home = () => {
               <TableHead>End Date & Time</TableHead>
               <TableHead>Time remaining/passed</TableHead>
               <TableHead className="text-center">Save</TableHead>
-              <TableHead className="text-center">Solution</TableHead>
+              <TableHead className="text-center">Contest</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
-            {paginatedContests.map((contest) => {
+            {filteredContests.map((contest) => {
               return (
                 <TableRow
                   key={contest.contest_id}
@@ -298,16 +357,42 @@ const Home = () => {
                       )}
                   </TableCell>
                   <TableCell>{contest.contest_name}</TableCell>
-                  <TableCell>{contest.contest_date_start}</TableCell>
                   <TableCell>
-                    {Math.abs(
-                      new Date(contest.contest_date_end).getTime() -
-                        new Date(contest.contest_date_start).getTime()
-                    ) /
-                      (1000 * 60 * 60)}{" "}
+                    {new Date(contest.contest_date_start).toLocaleString(
+                      "en-US",
+                      {
+                        year: "numeric",
+                        month: "short",
+                        day: "numeric",
+                        hour: "2-digit",
+                        minute: "2-digit",
+                        timeZone: "IST",
+                      }
+                    )}
+                  </TableCell>
+                  <TableCell>
+                    {Math.round(
+                      Math.abs(
+                        new Date(contest.contest_date_end).getTime() -
+                          new Date(contest.contest_date_start).getTime()
+                      ) /
+                        (1000 * 60 * 60)
+                    )}{" "}
                     hours
                   </TableCell>
-                  <TableCell>{contest.contest_date_end}</TableCell>
+                  <TableCell>
+                    {new Date(contest.contest_date_end).toLocaleString(
+                      "en-US",
+                      {
+                        year: "numeric",
+                        month: "short",
+                        day: "numeric",
+                        hour: "2-digit",
+                        minute: "2-digit",
+                        timeZone: "IST",
+                      }
+                    )}
+                  </TableCell>
                   <TableCell>
                     {contest.contest_phase < 1
                       ? new Date() >= new Date(contest.contest_date_start) &&
@@ -348,20 +433,16 @@ const Home = () => {
                     </button>
                   </TableCell>
                   <TableCell className="text-center">
-                    <button
-                      onClick={() =>
-                        handleRedirect(
-                          contest.contest_origin,
-                          contest.contest_name,
-                          contest.contest_id
-                        )
-                      }
-                      disabled={contest.contest_phase === 0}
+                    <Link
+                      href={contestLink(
+                        contest.contest_origin,
+                        contest.contest_id
+                      )}
+                      target="_blank"
                       className="hover:cursor-pointer disabled:hover:cursor-not-allowed flex items-center gap-1 justify-center w-full"
-                      title="View solution"
                     >
                       Visit <ExternalLink className="stroke-1 size-4" />
-                    </button>
+                    </Link>
                   </TableCell>
                 </TableRow>
               );
@@ -369,26 +450,44 @@ const Home = () => {
           </TableBody>
         </Table>
       ) : (
-        <span className="text-xl text-center">
-          No bookmarked contests found. Redirect in {time}{" "}
-          {time > 1 ? "seconds" : "second"}...
-        </span>
+        <div className="flex flex-col items-center justify-center py-10">
+          {showBookmarked ? (
+            <span className="text-xl text-center">
+              No bookmarked contests found. Redirect in {time}{" "}
+              {time > 1 ? "seconds" : "second"}...
+            </span>
+          ) : (
+            <span className="text-xl text-center">
+              No contests found for your search criteria. Try adjusting your
+              filters.
+            </span>
+          )}
+        </div>
       )}
 
-      {paginatedContests.length > 0 && (
+      {filteredContests.length > 0 && !showBookmarked && (
         <div className="flex justify-end my-4 gap-3">
           <Button
-            onClick={() => handlePageChange(currentPage - 1)}
-            disabled={currentPage === 1}
+            onClick={() => handlePageChange(pagination.page - 1)}
+            disabled={pagination.page === 1}
           >
             Previous
           </Button>
           <Button
-            onClick={() => handlePageChange(currentPage + 1)}
-            disabled={currentPage >= totalPages}
+            onClick={() => handlePageChange(pagination.page + 1)}
+            disabled={pagination.page >= pagination.pages}
           >
             Next
           </Button>
+        </div>
+      )}
+
+      {emailPopupOpen && (
+        <div className="h-screen fixed inset-0 flex items-center justify-center bg-black/50">
+          <Newsletter
+            setEmailPopupOpen={setEmailPopupOpen}
+            subscribeEmail={subscribeEmail}
+          />
         </div>
       )}
     </div>

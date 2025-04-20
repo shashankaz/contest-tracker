@@ -1,13 +1,13 @@
 import { create } from "zustand";
 
 interface PlatformState {
-  platform: "all" | "codeforces" | "codechef" | "leetcode";
+  platform: "" | "codeforces" | "codechef" | "leetcode";
   setPlatform: (
-    newPlatform: "all" | "codeforces" | "codechef" | "leetcode"
+    newPlatform: "" | "codeforces" | "codechef" | "leetcode"
   ) => void;
 }
 
 export const usePlatform = create<PlatformState>((set) => ({
-  platform: "all",
+  platform: "",
   setPlatform: (newPlatform) => set({ platform: newPlatform }),
 }));
