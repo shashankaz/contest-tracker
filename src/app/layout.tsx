@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
 import { Toaster } from "react-hot-toast";
+import Script from "next/script";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -15,14 +16,45 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: {
-    template: "%s | Contest Tracker",
-    default: "Contest Tracker",
+  title: "Contest Tracker Hub",
+  description:
+    "Contest Tracker Hub helps you track upcoming programming contests on Codeforces, Codechef, and Leetcode. Stay updated with the latest coding competitions and challenges.",
+  keywords: [
+    "Contest Tracker",
+    "programming contests",
+    "Codeforces",
+    "Codechef",
+    "Leetcode",
+    "competitive programming",
+    "coding competitions",
+    "online contests",
+    "programming challenges",
+    "coding events",
+    "upcoming contests",
+    "coding calendar",
+  ],
+  openGraph: {
+    title: "Contest Tracker Hub",
+    description:
+      "Contest Tracker Hub helps you track upcoming programming contests on Codeforces, Codechef, and Leetcode. Stay updated with the latest coding competitions and challenges.",
+    siteName: "Contest Tracker",
+    url: "https://contest-tracker-hub.vercel.app",
+    type: "website",
   },
-  description: "Track upcoming contests on Codeforces, Codechef, and Leetcode",
-  keywords:
-    "programming contests, Codeforces, Codechef, Leetcode, competitive programming, coding competitions, hackathons, online contests, programming challenges, coding events",
-  robots: "index, follow",
+};
+
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  name: "Contest Tracker Hub",
+  url: "https://contest-tracker-hub.vercel.app",
+  description:
+    "Contest Tracker Hub helps you track upcoming programming contests on Codeforces, Codechef, and Leetcode. Stay updated with the latest coding competitions and challenges.",
+  sameAs: [
+    "https://codeforces.com/",
+    "https://www.codechef.com/",
+    "https://leetcode.com/",
+  ],
 };
 
 export default function RootLayout({
@@ -32,18 +64,6 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <head>
-        <meta
-          name="description"
-          content="Track upcoming contests on Codeforces, Codechef, and Leetcode"
-        />
-        <meta
-          name="keywords"
-          content="programming contests, Codeforces, Codechef, Leetcode, competitive programming, coding competitions, hackathons, online contests, programming challenges, coding events"
-        />
-        <meta name="author" content="Contest Tracker Team" />
-        <meta name="robots" content="index, follow" />
-      </head>
       <body
         suppressHydrationWarning
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
@@ -58,6 +78,11 @@ export default function RootLayout({
         </ThemeProvider>
         <Toaster position="top-center" reverseOrder={false} />
       </body>
+      <Script
+        id="website-schema"
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
     </html>
   );
 }
