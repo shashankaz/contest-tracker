@@ -440,23 +440,23 @@ const Home = () => {
                       <button
                         onClick={() => handleBookmark(contest.contest_id)}
                         title="Bookmark contest"
-                        className="hover:cursor-pointer"
+                        className="hover:cursor-pointer px-3"
                       >
                         {bookmarkedContests.includes(contest.contest_id) ? (
                           <Image
-                            src="/unsave.png"
+                            src="/unsave.svg"
                             height={100}
                             width={100}
                             alt="unsave"
-                            className="size-4 dark:invert"
+                            className="size-5 dark:invert"
                           />
                         ) : (
                           <Image
-                            src="/save.png"
+                            src="/save.svg"
                             height={100}
                             width={100}
                             alt="save"
-                            className="size-4 dark:invert"
+                            className="size-5 dark:invert"
                           />
                         )}
                       </button>
