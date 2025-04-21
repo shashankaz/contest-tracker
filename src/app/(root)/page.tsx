@@ -413,7 +413,10 @@ const Home = () => {
                         : "bg-red-300 dark:bg-red-700"
                     )}
                   >
-                    <TableCell className="flex gap-2 items-center">
+                    <TableCell
+                      className="flex gap-2 items-center"
+                      title={contest.contest_origin}
+                    >
                       <Image
                         height={14}
                         width={14}
