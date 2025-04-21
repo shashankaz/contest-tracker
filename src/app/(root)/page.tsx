@@ -319,6 +319,7 @@ const Home = () => {
                 onChange={handleSearchChange}
                 className="pl-9 pr-12"
                 ref={searchRef}
+                disabled={loading}
               />
               <Search className="size-4 absolute top-1/2 -translate-1/2 left-5 text-gray-400" />
               <span className="flex items-center absolute top-1/2 -translate-1/2 -right-2">
@@ -332,6 +333,7 @@ const Home = () => {
               onValueChange={(value: "codeforces" | "codechef" | "leetcode") =>
                 setPlatform(value)
               }
+              disabled={loading}
             >
               <SelectTrigger className="sm:w-[180px]">
                 <SelectValue placeholder="Select Platform" />
@@ -342,7 +344,10 @@ const Home = () => {
                 <SelectItem value="leetcode">Leetcode</SelectItem>
               </SelectContent>
             </Select>
-            <Button onClick={() => setShowBookmarked(!showBookmarked)}>
+            <Button
+              onClick={() => setShowBookmarked(!showBookmarked)}
+              disabled={loading}
+            >
               {showBookmarked ? "Show All" : "Show Bookmarked"}
             </Button>
             <Button variant="secondary" title="Live users">
