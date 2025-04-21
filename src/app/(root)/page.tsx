@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useState, useMemo, useRef } from "react";
 import Image from "next/image";
 import axios from "axios";
 import { ExternalLink, Eye, Search, SquareChevronLeft } from "lucide-react";
@@ -9,6 +9,7 @@ import { formatDistanceToNow } from "date-fns";
 import Link from "next/link";
 import { debounce } from "lodash";
 import Cookies from "js-cookie";
+import toast from "react-hot-toast";
 
 import {
   Table,
@@ -34,7 +35,7 @@ import OverLay from "@/components/OverLay";
 import Loading from "@/components/Loading";
 import Newsletter from "@/components/Newsletter";
 import { usePlatform } from "@/store/useStore";
-import toast from "react-hot-toast";
+import TableLoadingSkeleton from "@/components/TableLoadingSkeleton";
 
 axios.defaults.baseURL = process.env.NEXT_PUBLIC_API_URL;
 
@@ -57,7 +58,8 @@ interface PaginationInfo {
 
 const Home = () => {
   const [contest, setContest] = useState<Contest[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
+  const [initialLoading, setInitialLoading] = useState(true);
   const [bookmarkedContests, setBookmarkedContests] = useState<string[]>([]);
   const [showBookmarked, setShowBookmarked] = useState(false);
   const [open, setOpen] = useState(false);
@@ -76,6 +78,8 @@ const Home = () => {
   const [search, setSearch] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
   const [userVisits, setUserVisits] = useState(0);
+
+  const searchRef = useRef<HTMLInputElement>(null);
 
   const debouncedSearchHandler = useMemo(
     () =>
@@ -116,6 +120,17 @@ const Home = () => {
   }, []);
 
   useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "k") {
+        e.preventDefault();
+        searchRef.current?.focus();
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, []);
+
+  useEffect(() => {
     const timer = setTimeout(() => {
       const isEmailSubscribed = Cookies.get("emailSubscribed");
       if (!isEmailSubscribed) {
@@ -129,9 +144,13 @@ const Home = () => {
     };
   }, []);
 
-  const fetchContest = async (pageNumber = 1) => {
+  const fetchContest = async (pageNumber = 1, isInitial = false) => {
     try {
-      setLoading(true);
+      if (isInitial) {
+        setInitialLoading(true);
+      } else {
+        setLoading(true);
+      }
       const response = await axios.get(
         `/api/contest/?page=${pageNumber}&limit=10&search=${debouncedSearch}&origin=${platform}`
       );
@@ -141,9 +160,28 @@ const Home = () => {
     } catch (error) {
       console.error(error);
     } finally {
-      setLoading(false);
+      if (isInitial) {
+        setInitialLoading(false);
+      } else {
+        setLoading(false);
+      }
     }
   };
+
+  useEffect(() => {
+    fetchContest(1, true);
+    fetchVisits();
+    const savedBookmarks = JSON.parse(
+      localStorage.getItem("bookmarkedContests") || "[]"
+    );
+    setBookmarkedContests(savedBookmarks);
+  }, []);
+
+  useEffect(() => {
+    if (!initialLoading) {
+      fetchContest();
+    }
+  }, [platform, debouncedSearch]);
 
   const contestLink = (platform: string, contest_id: string) => {
     switch (platform) {
@@ -177,15 +215,6 @@ const Home = () => {
     );
     setUserVisits(response.data.userCount);
   };
-
-  useEffect(() => {
-    fetchContest();
-    fetchVisits();
-    const savedBookmarks = JSON.parse(
-      localStorage.getItem("bookmarkedContests") || "[]"
-    );
-    setBookmarkedContests(savedBookmarks);
-  }, [platform, debouncedSearch]);
 
   useEffect(() => {
     setOpen(false);
@@ -271,7 +300,7 @@ const Home = () => {
     setTime(4);
   }, [showBookmarked]);
 
-  if (loading) {
+  if (initialLoading) {
     return <Loading />;
   }
 
@@ -288,9 +317,15 @@ const Home = () => {
                 placeholder="Search Contest"
                 value={search}
                 onChange={handleSearchChange}
-                className="pl-9"
+                className="pl-9 pr-12"
+                ref={searchRef}
               />
               <Search className="size-4 absolute top-1/2 -translate-1/2 left-5 text-gray-400" />
+              <span className="flex items-center absolute top-1/2 -translate-1/2 -right-2">
+                <span className="text-xs text-gray-500 dark:bg-gray-700 dark:text-gray-300 rounded px-1 py-0.5">
+                  Ctrl K
+                </span>
+              </span>
             </div>
             <Select
               value={platform}
@@ -333,7 +368,9 @@ const Home = () => {
             />
           </div>
         )}
-        {filteredContests.length > 0 ? (
+        {loading ? (
+          <TableLoadingSkeleton />
+        ) : filteredContests.length > 0 ? (
           <Table>
             <TableCaption>
               Contest List{" "}
@@ -493,7 +530,7 @@ const Home = () => {
             )}
           </div>
         )}
-        {filteredContests.length > 0 && !showBookmarked && (
+        {filteredContests.length > 0 && !showBookmarked && !loading && (
           <div className="flex justify-end my-4 gap-3">
             <Button
               onClick={() => handlePageChange(pagination.page - 1)}
