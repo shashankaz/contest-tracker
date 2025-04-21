@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { X } from "lucide-react";
 import Cookies from "js-cookie";
+import toast from "react-hot-toast";
 import { Input } from "./ui/input";
 import { Button } from "./ui/button";
 
@@ -11,10 +12,19 @@ interface NewsletterProps {
 
 const Newsletter = ({ setEmailPopupOpen, subscribeEmail }: NewsletterProps) => {
   const [email, setEmail] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const handleSubmit = () => {
-    subscribeEmail(email);
-    setEmailPopupOpen(false);
+    try {
+      setLoading(true);
+      subscribeEmail(email);
+      setEmailPopupOpen(false);
+      toast.success("Subscribed to newsletter");
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -38,6 +48,7 @@ const Newsletter = ({ setEmailPopupOpen, subscribeEmail }: NewsletterProps) => {
           className="w-full text-sm sm:text-base"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
+          disabled={loading}
         />
       </div>
       <Button onClick={handleSubmit} className="w-full text-sm">
