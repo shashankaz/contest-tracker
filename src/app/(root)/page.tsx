@@ -157,6 +157,19 @@ const Home = () => {
     }
   };
 
+  const platformIcon = (platform: string) => {
+    switch (platform) {
+      case "codeforces":
+        return "/codeforces.svg";
+      case "codechef":
+        return "/codechef.svg";
+      case "leetcode":
+        return "/leetcode.svg";
+      default:
+        return "";
+    }
+  };
+
   const fetchVisits = async () => {
     const response = await axios.get(
       `${process.env.NEXT_PUBLIC_API_URL}/api/unique-users`
@@ -329,7 +342,6 @@ const Home = () => {
                   day: "numeric",
                   hour: "2-digit",
                   minute: "2-digit",
-                  timeZone: "IST",
                 })}{" "}
                 IST, all times in IST)
               </span>
@@ -358,6 +370,12 @@ const Home = () => {
                     )}
                   >
                     <TableCell className="flex gap-2 items-center">
+                      <Image
+                        height={14}
+                        width={14}
+                        src={platformIcon(contest.contest_origin)}
+                        alt={contest.contest_origin}
+                      />
                       {contest.contest_type}
                       {new Date() >= new Date(contest.contest_date_start) &&
                         new Date() <= new Date(contest.contest_date_end) && (
@@ -376,7 +394,6 @@ const Home = () => {
                           day: "numeric",
                           hour: "2-digit",
                           minute: "2-digit",
-                          timeZone: "IST",
                         }
                       )}
                     </TableCell>
@@ -399,7 +416,6 @@ const Home = () => {
                           day: "numeric",
                           hour: "2-digit",
                           minute: "2-digit",
-                          timeZone: "IST",
                         }
                       )}
                     </TableCell>
