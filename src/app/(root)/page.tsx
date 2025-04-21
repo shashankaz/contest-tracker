@@ -426,7 +426,7 @@ const Home = () => {
                       {contest.contest_type}
                       {new Date() >= new Date(contest.contest_date_start) &&
                         new Date() <= new Date(contest.contest_date_end) && (
-                          <span className="text-xs uppercase bg-white text-red-500 border border-red-500 px-3 py-0.5 rounded-2xl">
+                          <span className="text-xs uppercase bg-white text-red-500 border border-red-500 px-3 py-0.5 rounded-2xl font-medium">
                             Live
                           </span>
                         )}
