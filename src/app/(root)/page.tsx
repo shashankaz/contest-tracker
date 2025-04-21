@@ -34,6 +34,7 @@ import OverLay from "@/components/OverLay";
 import Loading from "@/components/Loading";
 import Newsletter from "@/components/Newsletter";
 import { usePlatform } from "@/store/useStore";
+import toast from "react-hot-toast";
 
 axios.defaults.baseURL = process.env.NEXT_PUBLIC_API_URL;
 
@@ -223,8 +224,10 @@ const Home = () => {
       updatedBookmarks = updatedBookmarks.filter(
         (bookmarkId) => bookmarkId !== id
       );
+      toast.success("Contest removed from bookmarks");
     } else {
       updatedBookmarks.push(id);
+      toast.success("Contest added to bookmarks");
     }
     setBookmarkedContests(updatedBookmarks);
     localStorage.setItem(
