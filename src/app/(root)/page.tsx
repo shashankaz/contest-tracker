@@ -183,7 +183,21 @@ const Home = () => {
     }
   }, [platform, debouncedSearch]);
 
-  const contestLink = (platform: string, contest_id: string) => {
+  const slugify = (name: string) => {
+    return name
+      .toLowerCase()
+      .replace(/[\[\]]/g, "")
+      .replace(/[^a-z0-9\s-]/g, "")
+      .replace(/\s+/g, "-")
+      .replace(/-+/g, "-")
+      .trim();
+  };
+
+  const contestLink = (
+    platform: string,
+    contest_id: string,
+    contest_name: string
+  ) => {
     switch (platform) {
       case "codeforces":
         return `https://codeforces.com/contests/${contest_id}`;
@@ -191,6 +205,10 @@ const Home = () => {
         return `https://www.codechef.com/${contest_id}`;
       case "leetcode":
         return `https://leetcode.com/contest/${contest_id}`;
+      case "geekforgeeks":
+        return `https://practice.geeksforgeeks.org/contest/${slugify(
+          contest_name
+        )}`;
       default:
         return "";
     }
@@ -204,6 +222,8 @@ const Home = () => {
         return "/codechef.svg";
       case "leetcode":
         return "/leetcode.svg";
+      case "geekforgeeks":
+        return "/geekforgeeks.svg";
       default:
         return "";
     }
@@ -342,6 +362,7 @@ const Home = () => {
                 <SelectItem value="codeforces">Codeforces</SelectItem>
                 <SelectItem value="codechef">Codechef</SelectItem>
                 <SelectItem value="leetcode">Leetcode</SelectItem>
+                <SelectItem value="geekforgeeks">GeekforGeeks</SelectItem>
               </SelectContent>
             </Select>
             <Button
@@ -435,7 +456,8 @@ const Home = () => {
                       <Link
                         href={contestLink(
                           contest.contest_origin,
-                          contest.contest_id
+                          contest.contest_id,
+                          contest.contest_name
                         )}
                         target="_blank"
                         className="hover:underline flex items-center gap-2"

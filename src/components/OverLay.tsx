@@ -15,7 +15,9 @@ interface OverLayProps {
   showBookmarked: boolean;
   setShowBookmarked: (value: boolean) => void;
   platform: string;
-  setPlatform: (value: "" | "codeforces" | "codechef" | "leetcode") => void;
+  setPlatform: (
+    value: "" | "codeforces" | "codechef" | "leetcode" | "geekforgeeks"
+  ) => void;
   liveUsers: number;
   search: string;
   handleSearchChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
@@ -54,7 +56,12 @@ const OverLay = ({
           <Select
             value={platform}
             onValueChange={(
-              value: "" | "codeforces" | "codechef" | "leetcode"
+              value:
+                | ""
+                | "codeforces"
+                | "codechef"
+                | "leetcode"
+                | "geekforgeeks"
             ) => setPlatform(value)}
           >
             <SelectTrigger className="w-full">
@@ -64,6 +71,7 @@ const OverLay = ({
               <SelectItem value="codeforces">Codeforces</SelectItem>
               <SelectItem value="codechef">Codechef</SelectItem>
               <SelectItem value="leetcode">Leetcode</SelectItem>
+              <SelectItem value="geekforgeeks">GeekforGeeks</SelectItem>
             </SelectContent>
           </Select>
           <Button onClick={() => setShowBookmarked(!showBookmarked)}>
