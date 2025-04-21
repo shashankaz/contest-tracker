@@ -400,7 +400,6 @@ const Home = () => {
                 <TableHead>End Date & Time</TableHead>
                 <TableHead>Time remaining/passed</TableHead>
                 <TableHead className="text-center">Save</TableHead>
-                <TableHead className="text-center">Contest</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -429,7 +428,20 @@ const Home = () => {
                           </span>
                         )}
                     </TableCell>
-                    <TableCell>{contest.contest_name}</TableCell>
+                    <TableCell>
+                      <Link
+                        href={contestLink(
+                          contest.contest_origin,
+                          contest.contest_id
+                        )}
+                        target="_blank"
+                        className="hover:underline flex items-center gap-2"
+                        title="Visit Contest"
+                      >
+                        {contest.contest_name}
+                        <ExternalLink className="stroke-1 size-4" />
+                      </Link>
+                    </TableCell>
                     <TableCell>
                       {new Date(contest.contest_date_start).toLocaleString(
                         "en-US",
@@ -502,18 +514,6 @@ const Home = () => {
                           />
                         )}
                       </button>
-                    </TableCell>
-                    <TableCell className="text-center">
-                      <Link
-                        href={contestLink(
-                          contest.contest_origin,
-                          contest.contest_id
-                        )}
-                        target="_blank"
-                        className="hover:cursor-pointer disabled:hover:cursor-not-allowed flex items-center gap-1 justify-center w-full"
-                      >
-                        Visit <ExternalLink className="stroke-1 size-4" />
-                      </Link>
                     </TableCell>
                   </TableRow>
                 );
