@@ -490,7 +490,7 @@ const Home = () => {
                             height={100}
                             width={100}
                             alt="unsave"
-                            className="size-5 dark:invert"
+                            className="size-5 min-w-5 dark:invert"
                           />
                         ) : (
                           <Image
@@ -498,7 +498,7 @@ const Home = () => {
                             height={100}
                             width={100}
                             alt="save"
-                            className="size-5 dark:invert"
+                            className="size-5 min-w-5 dark:invert"
                           />
                         )}
                       </button>
