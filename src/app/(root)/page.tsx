@@ -386,7 +386,7 @@ const Home = () => {
               Contest List{" "}
               <span className="text-xs text-gray-500">
                 (Last updated:{" "}
-                {new Date(lastUpdatedAt).toLocaleString("en-US", {
+                {new Date(lastUpdatedAt).toLocaleString("en-IN", {
                   year: "numeric",
                   month: "short",
                   day: "numeric",
@@ -453,7 +453,7 @@ const Home = () => {
                     </TableCell>
                     <TableCell>
                       {new Date(contest.contest_date_start).toLocaleString(
-                        "en-US",
+                        "en-IN",
                         {
                           year: "numeric",
                           month: "short",
@@ -475,7 +475,7 @@ const Home = () => {
                     </TableCell>
                     <TableCell>
                       {new Date(contest.contest_date_end).toLocaleString(
-                        "en-US",
+                        "en-IN",
                         {
                           year: "numeric",
                           month: "short",
