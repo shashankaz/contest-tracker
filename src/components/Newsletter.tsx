@@ -15,6 +15,11 @@ const Newsletter = ({ setEmailPopupOpen, subscribeEmail }: NewsletterProps) => {
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = () => {
+    if (!email || !email.includes("@")) {
+      toast.error("Invalid email address");
+      return;
+    }
+
     try {
       setLoading(true);
       subscribeEmail(email);
