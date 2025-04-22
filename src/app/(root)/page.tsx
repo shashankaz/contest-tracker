@@ -183,21 +183,7 @@ const Home = () => {
     }
   }, [platform, debouncedSearch]);
 
-  const slugify = (name: string) => {
-    return name
-      .toLowerCase()
-      .replace(/[\[\]]/g, "")
-      .replace(/[^a-z0-9\s-]/g, "")
-      .replace(/\s+/g, "-")
-      .replace(/-+/g, "-")
-      .trim();
-  };
-
-  const contestLink = (
-    platform: string,
-    contest_id: string,
-    contest_name: string
-  ) => {
+  const contestLink = (platform: string, contest_id: string) => {
     switch (platform) {
       case "codeforces":
         return `https://codeforces.com/contests/${contest_id}`;
@@ -206,9 +192,7 @@ const Home = () => {
       case "leetcode":
         return `https://leetcode.com/contest/${contest_id}`;
       case "geeksforgeeks":
-        return `https://practice.geeksforgeeks.org/contest/${slugify(
-          contest_name
-        )}`;
+        return `https://practice.geeksforgeeks.org/contest/${contest_id}`;
       default:
         return "";
     }
@@ -456,8 +440,7 @@ const Home = () => {
                       <Link
                         href={contestLink(
                           contest.contest_origin,
-                          contest.contest_id,
-                          contest.contest_name
+                          contest.contest_id
                         )}
                         target="_blank"
                         className="hover:underline flex items-center gap-2"
