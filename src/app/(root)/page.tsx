@@ -205,7 +205,7 @@ const Home = () => {
         return `https://www.codechef.com/${contest_id}`;
       case "leetcode":
         return `https://leetcode.com/contest/${contest_id}`;
-      case "geekforgeeks":
+      case "geeksforgeeks":
         return `https://practice.geeksforgeeks.org/contest/${slugify(
           contest_name
         )}`;
@@ -222,8 +222,8 @@ const Home = () => {
         return "/codechef.svg";
       case "leetcode":
         return "/leetcode.svg";
-      case "geekforgeeks":
-        return "/geekforgeeks.svg";
+      case "geeksforgeeks":
+        return "/geeksforgeeks.svg";
       default:
         return "";
     }
@@ -362,7 +362,7 @@ const Home = () => {
                 <SelectItem value="codeforces">Codeforces</SelectItem>
                 <SelectItem value="codechef">Codechef</SelectItem>
                 <SelectItem value="leetcode">Leetcode</SelectItem>
-                <SelectItem value="geekforgeeks">GeekforGeeks</SelectItem>
+                <SelectItem value="geeksforgeeks">GeeksforGeeks</SelectItem>
               </SelectContent>
             </Select>
             <Button

@@ -16,7 +16,7 @@ interface OverLayProps {
   setShowBookmarked: (value: boolean) => void;
   platform: string;
   setPlatform: (
-    value: "" | "codeforces" | "codechef" | "leetcode" | "geekforgeeks"
+    value: "" | "codeforces" | "codechef" | "leetcode" | "geeksforgeeks"
   ) => void;
   liveUsers: number;
   search: string;
@@ -61,7 +61,7 @@ const OverLay = ({
                 | "codeforces"
                 | "codechef"
                 | "leetcode"
-                | "geekforgeeks"
+                | "geeksforgeeks"
             ) => setPlatform(value)}
           >
             <SelectTrigger className="w-full">
@@ -71,7 +71,7 @@ const OverLay = ({
               <SelectItem value="codeforces">Codeforces</SelectItem>
               <SelectItem value="codechef">Codechef</SelectItem>
               <SelectItem value="leetcode">Leetcode</SelectItem>
-              <SelectItem value="geekforgeeks">GeekforGeeks</SelectItem>
+              <SelectItem value="geeksforgeeks">GeeksforGeeks</SelectItem>
             </SelectContent>
           </Select>
           <Button onClick={() => setShowBookmarked(!showBookmarked)}>
