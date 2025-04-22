@@ -394,7 +394,7 @@ const Home = () => {
                   minute: "2-digit",
                   timeZone: "UTC",
                 })}{" "}
-                IST, all times in IST)
+                IST)
               </span>
             </TableCaption>
             <TableHeader>
