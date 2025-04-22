@@ -392,6 +392,7 @@ const Home = () => {
                   day: "numeric",
                   hour: "2-digit",
                   minute: "2-digit",
+                  timeZone: "UTC",
                 })}{" "}
                 IST, all times in IST)
               </span>
@@ -460,6 +461,7 @@ const Home = () => {
                           day: "numeric",
                           hour: "2-digit",
                           minute: "2-digit",
+                          timeZone: "UTC",
                         }
                       )}
                     </TableCell>
@@ -482,6 +484,7 @@ const Home = () => {
                           day: "numeric",
                           hour: "2-digit",
                           minute: "2-digit",
+                          timeZone: "UTC",
                         }
                       )}
                     </TableCell>
