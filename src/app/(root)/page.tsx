@@ -427,6 +427,7 @@ const Home = () => {
                         width={14}
                         src={platformIcon(contest.contest_origin)}
                         alt={contest.contest_origin}
+                        draggable={false}
                       />
                       {contest.contest_type}
                       {new Date() >= new Date(contest.contest_date_start) &&
