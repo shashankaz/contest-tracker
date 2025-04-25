@@ -125,6 +125,10 @@ const Home = () => {
         e.preventDefault();
         searchRef.current?.focus();
       }
+      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "b") {
+        e.preventDefault();
+        setShowBookmarked((prev) => !prev);
+      }
       if (
         !e.ctrlKey &&
         !e.metaKey &&
@@ -346,9 +350,13 @@ const Home = () => {
             </div>
             <Select
               value={platform}
-              onValueChange={(value: "codeforces" | "codechef" | "leetcode") =>
-                setPlatform(value)
-              }
+              onValueChange={(
+                value: "codeforces" | "codechef" | "leetcode"
+              ) => {
+                setPlatform(value);
+                setSearch("");
+                setDebouncedSearch("");
+              }}
               disabled={loading}
             >
               <SelectTrigger className="sm:w-[180px]">
