@@ -125,6 +125,18 @@ const Home = () => {
         e.preventDefault();
         searchRef.current?.focus();
       }
+      if (
+        !e.ctrlKey &&
+        !e.metaKey &&
+        !e.altKey &&
+        (/^[a-zA-Z0-9]$/.test(e.key) || e.key === "Backspace") &&
+        document.activeElement &&
+        !["INPUT", "TEXTAREA", "SELECT"].includes(
+          document.activeElement.tagName
+        )
+      ) {
+        searchRef.current?.focus();
+      }
     };
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
