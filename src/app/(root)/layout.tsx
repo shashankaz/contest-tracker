@@ -3,7 +3,7 @@ interface HomeLayoutProps {
 }
 
 const HomeLayout = async ({ children }: HomeLayoutProps) => {
-  return <div className="px-4 sm:px-6 md:px-8 lg:px-10">{children}</div>;
+  return <div>{children}</div>;
 };
 
 export default HomeLayout;
