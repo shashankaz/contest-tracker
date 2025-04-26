@@ -1,9 +1,21 @@
 import { create } from "zustand";
 
 interface PlatformState {
-  platform: "" | "codeforces" | "codechef" | "leetcode" | "geeksforgeeks";
+  platform:
+    | ""
+    | "codeforces"
+    | "codechef"
+    | "leetcode"
+    | "geeksforgeeks"
+    | "atcoder";
   setPlatform: (
-    newPlatform: "" | "codeforces" | "codechef" | "leetcode" | "geeksforgeeks"
+    newPlatform:
+      | ""
+      | "codeforces"
+      | "codechef"
+      | "leetcode"
+      | "geeksforgeeks"
+      | "atcoder"
   ) => void;
 }
 

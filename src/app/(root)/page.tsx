@@ -209,6 +209,8 @@ const Home = () => {
         return `https://leetcode.com/contest/${contest_id}`;
       case "geeksforgeeks":
         return `https://practice.geeksforgeeks.org/contest/${contest_id}`;
+      case "atcoder":
+        return `https://atcoder.jp/contests/${contest_id}`;
       default:
         return "";
     }
@@ -224,6 +226,8 @@ const Home = () => {
         return "/leetcode.svg";
       case "geeksforgeeks":
         return "/geeksforgeeks.svg";
+      case "atcoder":
+        return "/atcoder.svg";
       default:
         return "";
     }
@@ -351,7 +355,12 @@ const Home = () => {
             <Select
               value={platform}
               onValueChange={(
-                value: "codeforces" | "codechef" | "leetcode"
+                value:
+                  | "codeforces"
+                  | "codechef"
+                  | "leetcode"
+                  | "geeksforgeeks"
+                  | "atcoder"
               ) => {
                 setPlatform(value);
                 setSearch("");
@@ -364,9 +373,10 @@ const Home = () => {
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="codeforces">Codeforces</SelectItem>
-                <SelectItem value="codechef">Codechef</SelectItem>
+                <SelectItem value="codechef">CodeChef</SelectItem>
                 <SelectItem value="leetcode">Leetcode</SelectItem>
                 <SelectItem value="geeksforgeeks">GeeksforGeeks</SelectItem>
+                <SelectItem value="atcoder">AtCoder</SelectItem>
               </SelectContent>
             </Select>
             <Button
