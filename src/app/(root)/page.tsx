@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useMemo, useRef } from "react";
 import Image from "next/image";
+import { Comfortaa } from "next/font/google";
 import axios from "axios";
 import { ExternalLink, Eye, Search, SquareChevronLeft } from "lucide-react";
 import { io } from "socket.io-client";
@@ -38,6 +39,8 @@ import { usePlatform } from "@/store/useStore";
 import TableLoadingSkeleton from "@/components/TableLoadingSkeleton";
 
 axios.defaults.baseURL = process.env.NEXT_PUBLIC_API_URL;
+
+const comfortaa = Comfortaa({ subsets: ["latin"], weight: "700" });
 
 interface Contest {
   contest_id: string;
@@ -332,8 +335,10 @@ const Home = () => {
     <div className="flex flex-col justify-between min-h-screen">
       <div>
         <div className="flex items-center justify-between h-20">
-          <h1 className="text-3xl md:text-4xl font-semibold">
-            Contest Tracker
+          <h1
+            className={`text-3xl md:text-4xl font-semibold ${comfortaa.className}`}
+          >
+            Contest Tracker Hub
           </h1>
           <div className="hidden md:flex items-center justify-end gap-3">
             <div className="relative">
