@@ -249,11 +249,15 @@ const Home = () => {
     const end = new Date(contest.contest_date_end);
 
     if (now < start) {
-      return `${formatDistanceToNow(start)} remaining`;
+      return `${formatDistanceToNow(
+        addMinutes(addHours(start, -5), -30)
+      )} remaining`;
     } else if (now >= start && now <= end) {
-      return `${formatDistanceToNow(start)} passed`;
+      return `${formatDistanceToNow(
+        addMinutes(addHours(now, -5), -30)
+      )} passed`;
     } else {
-      return `${formatDistanceToNow(end)} ago`;
+      return `${formatDistanceToNow(addMinutes(addHours(end, -5), -30))} ago`;
     }
   };
 
@@ -360,7 +364,7 @@ const Home = () => {
       <div>
         <div className="flex items-center justify-between h-20">
           <h1
-            className={`text-3xl md:text-4xl font-semibold ${comfortaa.className}`}
+            className={`text-2xl md:text-4xl font-semibold ${comfortaa.className}`}
           >
             Contest Tracker Hub
           </h1>
