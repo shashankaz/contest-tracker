@@ -1,6 +1,6 @@
 const Loading = () => {
   return (
-    <div>
+    <div className="px-4 sm:px-6 md:px-8 lg:px-10">
       <div className="flex items-center justify-between h-20">
         <div className="h-10 w-64 bg-gray-200 dark:bg-gray-600 animate-pulse rounded-lg"></div>
         <div className="hidden md:flex items-center gap-3">
