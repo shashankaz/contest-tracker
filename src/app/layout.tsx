@@ -16,7 +16,10 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Contest Tracker Hub",
+  title: {
+    default: "Contest Tracker Hub",
+    template: "%s | Contest Tracker Hub",
+  },
   description:
     "Contest Tracker Hub helps you track upcoming programming contests on Codeforces, Codechef, and Leetcode. Stay updated with the latest coding competitions and challenges.",
   keywords: [
