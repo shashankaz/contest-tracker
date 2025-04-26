@@ -6,7 +6,7 @@ import { Comfortaa } from "next/font/google";
 import axios from "axios";
 import { ExternalLink, Eye, Search, SquareChevronLeft } from "lucide-react";
 import { io } from "socket.io-client";
-import { formatDistanceToNow } from "date-fns";
+import { addHours, addMinutes, formatDistanceToNow } from "date-fns";
 import Link from "next/link";
 import { debounce } from "lodash";
 import Cookies from "js-cookie";
@@ -243,6 +243,30 @@ const Home = () => {
     setUserVisits(response.data.userCount);
   };
 
+  const getTimeRemaining = (contest: Contest) => {
+    const now = addMinutes(addHours(new Date(), 5), 30);
+    const start = new Date(contest.contest_date_start);
+    const end = new Date(contest.contest_date_end);
+
+    if (now < start) {
+      return `${formatDistanceToNow(start)} remaining`;
+    } else if (now >= start && now <= end) {
+      return `${formatDistanceToNow(start)} passed`;
+    } else {
+      return `${formatDistanceToNow(end)} ago`;
+    }
+  };
+
+  const getCurrentPassed = (contest: Contest) => {
+    const now = addMinutes(addHours(new Date(), 5), 30);
+    const end = new Date(contest.contest_date_end);
+
+    if (now > end) {
+      return false;
+    }
+    return true;
+  };
+
   useEffect(() => {
     setOpen(false);
   }, [platform, showBookmarked]);
@@ -449,7 +473,7 @@ const Home = () => {
                   <TableRow
                     key={contest.contest_id}
                     className={cn(
-                      contest.contest_phase < 1
+                      getCurrentPassed(contest)
                         ? "bg-green-300 dark:bg-green-700"
                         : "bg-red-300 dark:bg-red-700"
                     )}
@@ -531,20 +555,7 @@ const Home = () => {
                         }
                       )}
                     </TableCell>
-                    <TableCell>
-                      {contest.contest_phase < 1
-                        ? new Date() >= new Date(contest.contest_date_start) &&
-                          new Date() <= new Date(contest.contest_date_end)
-                          ? `${formatDistanceToNow(
-                              new Date(contest.contest_date_start)
-                            )} passed`
-                          : `${formatDistanceToNow(
-                              new Date(contest.contest_date_start)
-                            )} remaining`
-                        : `${formatDistanceToNow(
-                            new Date(contest.contest_date_start)
-                          )} ago`}
-                    </TableCell>
+                    <TableCell>{getTimeRemaining(contest)}</TableCell>
                     <TableCell className="text-center">
                       <button
                         onClick={() => handleBookmark(contest.contest_id)}
