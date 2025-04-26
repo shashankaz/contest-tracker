@@ -254,7 +254,7 @@ const Home = () => {
       )} remaining`;
     } else if (now >= start && now <= end) {
       return `${formatDistanceToNow(
-        addMinutes(addHours(now, -5), -30)
+        addMinutes(addHours(start, -5), -30)
       )} passed`;
     } else {
       return `${formatDistanceToNow(addMinutes(addHours(end, -5), -30))} ago`;
@@ -269,6 +269,17 @@ const Home = () => {
       return false;
     }
     return true;
+  };
+
+  const getLiveContest = (contest: Contest) => {
+    const now = addMinutes(addHours(new Date(), 5), 30);
+    const start = new Date(contest.contest_date_start);
+    const end = new Date(contest.contest_date_end);
+
+    if (now >= start && now <= end) {
+      return true;
+    }
+    return false;
   };
 
   useEffect(() => {
@@ -502,12 +513,11 @@ const Home = () => {
                         }`}
                       />
                       {contest.contest_type}
-                      {new Date() >= new Date(contest.contest_date_start) &&
-                        new Date() <= new Date(contest.contest_date_end) && (
-                          <span className="text-xs uppercase bg-white text-red-500 border border-red-500 px-3 py-0.5 rounded-2xl font-medium">
-                            Live
-                          </span>
-                        )}
+                      {getLiveContest(contest) && (
+                        <span className="text-xs uppercase bg-white text-red-500 border border-red-500 px-3 py-0.5 rounded-2xl font-medium">
+                          Live
+                        </span>
+                      )}
                     </TableCell>
                     <TableCell>
                       <Link
