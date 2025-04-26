@@ -332,7 +332,7 @@ const Home = () => {
   }
 
   return (
-    <div className="flex flex-col justify-between min-h-screen">
+    <div className="flex flex-col justify-between min-h-screen px-4 sm:px-6 md:px-8 lg:px-10">
       <div>
         <div className="flex items-center justify-between h-20">
           <h1
@@ -416,7 +416,7 @@ const Home = () => {
         {loading ? (
           <TableLoadingSkeleton />
         ) : filteredContests.length > 0 ? (
-          <Table>
+          <Table className="border">
             <TableCaption>
               Contest List{" "}
               <span className="text-xs text-gray-500">
@@ -464,6 +464,14 @@ const Home = () => {
                         src={platformIcon(contest.contest_origin)}
                         alt={contest.contest_origin}
                         draggable={false}
+                        className={`${
+                          contest.contest_origin === "codechef" && "dark:invert"
+                        } ${
+                          contest.contest_origin === "atcoder" && "dark:invert"
+                        } ${
+                          contest.contest_origin === "geeksforgeeks" &&
+                          "dark:invert"
+                        }`}
                       />
                       {contest.contest_type}
                       {new Date() >= new Date(contest.contest_date_start) &&
@@ -619,7 +627,7 @@ const Home = () => {
                 return (
                   <span
                     key={idx}
-                    className="bg-gray-200 dark:bg-gray-800 py-1 md:py-2 px-2 md:px-3 rounded-sm mx-1 dark:text-white font-medium"
+                    className="bg-primary text-primary-foreground shadow-xs py-1 md:py-2 px-2 md:px-3 rounded-sm mx-1 font-medium"
                   >
                     {item}
                   </span>
