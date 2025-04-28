@@ -37,6 +37,7 @@ interface User {
     username: string;
     email: string;
   };
+  setUser: (user: User["user"]) => void;
 }
 
 export const usePlatform = create<PlatformState>((set) => ({
@@ -62,5 +63,5 @@ export const useUser = create<User>((set) => ({
     username: "",
     email: "",
   },
-  setUser: (user: User) => set({ user: user.user }),
+  setUser: (user) => set({ user }),
 }));
