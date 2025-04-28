@@ -257,6 +257,14 @@ const Home = () => {
     }
   };
 
+  const handleResetFilters = () => {
+    setPlatform("");
+    setSearch("");
+    setDebouncedSearch("");
+    setShowBookmarked(false);
+    setOpen(false);
+  };
+
   const fetchVisits = async () => {
     const response = await axios.get(
       `${process.env.NEXT_PUBLIC_API_URL}/api/unique-users`
@@ -494,15 +502,10 @@ const Home = () => {
           Past Contests
         </h2>
 
-        <div className="hidden md:flex items-center justify-end gap-3 py-4">
-          <div className="hidden md:flex items-center justify-end gap-3 py-4">
-            <Button
-              onClick={() => setShowBookmarked(!showBookmarked)}
-              disabled={loading}
-            >
-              {showBookmarked ? "Show All" : "Show Bookmarked"}
-            </Button>
-          </div>
+        <div className="hidden md:flex items-center justify-end gap-3 py-6">
+          <Button variant="secondary" onClick={handleResetFilters}>
+            Reset Filters
+          </Button>
           <div className="relative">
             <Input
               placeholder="Search Contest"
@@ -546,6 +549,12 @@ const Home = () => {
               <SelectItem value="atcoder">AtCoder</SelectItem>
             </SelectContent>
           </Select>
+          <Button
+            onClick={() => setShowBookmarked(!showBookmarked)}
+            disabled={loading}
+          >
+            {showBookmarked ? "Show All" : "Show Bookmarked"}
+          </Button>
         </div>
 
         {loading ? (
