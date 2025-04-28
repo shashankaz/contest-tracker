@@ -34,6 +34,7 @@ import { useLiveUsers, useOpen, usePlatform } from "@/store/useStore";
 import TableLoadingSkeleton from "@/components/TableLoadingSkeleton";
 import LoadingNew from "@/components/LoadingNew";
 import Navbar from "@/components/Navbar";
+import Footer from "@/components/Footer";
 
 axios.defaults.baseURL = process.env.NEXT_PUBLIC_API_URL;
 
@@ -74,7 +75,7 @@ const Home = () => {
   const { platform, setPlatform } = usePlatform();
   const [search, setSearch] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
-  const [userVisits, setUserVisits] = useState(0);
+  // const [userVisits, setUserVisits] = useState(0);
 
   const { liveUsers } = useLiveUsers();
   const { open, setOpen } = useOpen();
@@ -151,7 +152,7 @@ const Home = () => {
       const isEmailSubscribed = Cookies.get("emailSubscribed");
       if (!isEmailSubscribed) {
         setEmailPopupOpen(true);
-        Cookies.set("emailSubscribed", "true");
+        Cookies.set("emailSubscribed", "false", { expires: 7 });
       }
     }, 10000);
 
@@ -210,7 +211,7 @@ const Home = () => {
   useEffect(() => {
     fetchContest(1, true);
     fetchUpcomingContests();
-    fetchVisits();
+    // fetchVisits();
     const savedBookmarks = JSON.parse(
       localStorage.getItem("bookmarkedContests") || "[]"
     );
@@ -265,12 +266,12 @@ const Home = () => {
     setOpen(false);
   };
 
-  const fetchVisits = async () => {
-    const response = await axios.get(
-      `${process.env.NEXT_PUBLIC_API_URL}/api/unique-users`
-    );
-    setUserVisits(response.data.userCount);
-  };
+  // const fetchVisits = async () => {
+  //   const response = await axios.get(
+  //     `${process.env.NEXT_PUBLIC_API_URL}/api/unique-users`
+  //   );
+  //   setUserVisits(response.data.userCount);
+  // };
 
   const getTimeRemaining = (contest: Contest) => {
     const now = addMinutes(addHours(new Date(), 5), 30);
@@ -723,36 +724,7 @@ const Home = () => {
         )}
       </div>
 
-      <div>
-        <div className="flex flex-col items-center justify-center gap-2 md:gap-4 pt-4 text-sm md:text-base">
-          <h4 className="font-medium">Total Visits</h4>
-          <div>
-            {userVisits
-              .toString()
-              .split("")
-              .map((item, idx: number) => {
-                return (
-                  <span
-                    key={idx}
-                    className="bg-primary text-primary-foreground shadow-xs py-1 md:py-2 px-2 md:px-3 rounded-sm mx-1 font-medium"
-                  >
-                    {item}
-                  </span>
-                );
-              })}
-          </div>
-        </div>
-        <p className="text-center py-4 md:py-6 text-sm md:text-base">
-          Made with ❤️ by{" "}
-          <Link
-            href="https://x.com/shashankaz"
-            target="_blank"
-            className="hover:underline"
-          >
-            Shashank
-          </Link>
-        </p>
-      </div>
+      <Footer subscribeEmail={subscribeEmail} />
     </div>
   );
 };

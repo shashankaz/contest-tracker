@@ -48,7 +48,7 @@ const Navbar = () => {
   }, []);
 
   return (
-    <div className="flex items-center justify-between h-20">
+    <div className="flex items-center justify-between h-20 border-b">
       <h1
         className={`text-2xl md:text-4xl font-semibold ${comfortaa.className}`}
       >
@@ -58,6 +58,9 @@ const Navbar = () => {
         <Button variant="secondary" title="Live users">
           <Eye /> {liveUsers} LIVE
         </Button>
+        {/* <Button variant="secondary" title="Total visits">
+          <User /> {"100"} VISITS
+        </Button> */}
         <ModeToggle />
         {!user.token && (
           <Link href="/login">
