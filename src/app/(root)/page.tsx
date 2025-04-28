@@ -68,7 +68,7 @@ const Home = () => {
   const [open, setOpen] = useState(false);
   const [emailPopupOpen, setEmailPopupOpen] = useState(false);
   const [liveUsers, setLiveUsers] = useState(0);
-  const [time, setTime] = useState(4);
+  // const [time, setTime] = useState(4);
   const [pagination, setPagination] = useState<PaginationInfo>({
     total: 0,
     page: 1,
@@ -357,28 +357,28 @@ const Home = () => {
       : contest;
   }, [showBookmarked, contest, bookmarkedContests]);
 
-  useEffect(() => {
-    if (showBookmarked && filteredContests.length === 0) {
-      const timer = setTimeout(() => {
-        setShowBookmarked(false);
-        setPlatform("");
-        setTime(4);
-      }, 4000);
+  // useEffect(() => {
+  //   if (showBookmarked && filteredContests.length === 0) {
+  //     const timer = setTimeout(() => {
+  //       setShowBookmarked(false);
+  //       setPlatform("");
+  //       setTime(4);
+  //     }, 4000);
 
-      const countdown = setInterval(() => {
-        setTime((prevTime) => prevTime - 1);
-      }, 1000);
+  //     const countdown = setInterval(() => {
+  //       setTime((prevTime) => prevTime - 1);
+  //     }, 1000);
 
-      return () => {
-        clearTimeout(timer);
-        clearInterval(countdown);
-      };
-    }
-  }, [showBookmarked, filteredContests.length, setPlatform]);
+  //     return () => {
+  //       clearTimeout(timer);
+  //       clearInterval(countdown);
+  //     };
+  //   }
+  // }, [showBookmarked, filteredContests.length, setPlatform]);
 
-  useEffect(() => {
-    setTime(4);
-  }, [showBookmarked]);
+  // useEffect(() => {
+  //   setTime(4);
+  // }, [showBookmarked]);
 
   if (initialLoading) {
     return <LoadingNew />;
@@ -723,8 +723,7 @@ const Home = () => {
           <div className="flex flex-col items-center justify-center py-10">
             {showBookmarked ? (
               <span className="text-xl text-center">
-                No bookmarked contests found. Redirect in {time}{" "}
-                {time > 1 ? "seconds" : "second"}...
+                No bookmarked contests found.
               </span>
             ) : (
               <span className="text-xl text-center">
