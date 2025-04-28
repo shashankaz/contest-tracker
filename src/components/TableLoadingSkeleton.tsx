@@ -9,14 +9,14 @@ const TableLoadingSkeleton = () => {
           .map((_, index) => (
             <div
               key={index}
-              className="h-8 bg-gray-200 dark:bg-gray-600 animate-pulse my-1 rounded-md"
+              className="h-9 bg-gray-200 dark:bg-gray-600 animate-pulse my-1 rounded-md"
             ></div>
           ))}
       </div>
 
       <div className="flex justify-end gap-3 mt-4">
-        <div className="h-10 w-24 bg-gray-200 dark:bg-gray-600 animate-pulse rounded-lg"></div>
-        <div className="h-10 w-24 bg-gray-200 dark:bg-gray-600 animate-pulse rounded-lg"></div>
+        <div className="h-10 w-20 bg-gray-200 dark:bg-gray-600 animate-pulse rounded-lg"></div>
+        <div className="h-10 w-20 bg-gray-200 dark:bg-gray-600 animate-pulse rounded-lg"></div>
       </div>
     </div>
   );

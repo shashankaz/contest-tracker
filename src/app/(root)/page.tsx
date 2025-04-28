@@ -31,12 +31,11 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ModeToggle } from "@/components/theme-toggle";
-import { cn } from "@/lib/utils";
 import OverLay from "@/components/OverLay";
-import Loading from "@/components/Loading";
 import Newsletter from "@/components/Newsletter";
 import { usePlatform } from "@/store/useStore";
 import TableLoadingSkeleton from "@/components/TableLoadingSkeleton";
+import LoadingNew from "@/components/LoadingNew";
 
 axios.defaults.baseURL = process.env.NEXT_PUBLIC_API_URL;
 
@@ -61,6 +60,7 @@ interface PaginationInfo {
 
 const Home = () => {
   const [contest, setContest] = useState<Contest[]>([]);
+  const [upcomingContest, setUpcomingContest] = useState<Contest[]>([]);
   const [loading, setLoading] = useState(false);
   const [initialLoading, setInitialLoading] = useState(true);
   const [bookmarkedContests, setBookmarkedContests] = useState<string[]>([]);
@@ -171,7 +171,7 @@ const Home = () => {
         setLoading(true);
       }
       const response = await axios.get(
-        `/api/contest/?page=${pageNumber}&limit=10&search=${debouncedSearch}&origin=${platform}`
+        `/api/contest/?page=${pageNumber}&limit=10&search=${debouncedSearch}&origin=${platform}&upcoming=false`
       );
       setContest(response.data.contests);
       setPagination(response.data.pagination);
@@ -187,8 +187,32 @@ const Home = () => {
     }
   };
 
+  const fetchUpcomingContests = async (pageNumber = 1, isInitial = false) => {
+    try {
+      if (isInitial) {
+        setInitialLoading(true);
+      } else {
+        setLoading(true);
+      }
+      const response = await axios.get(
+        `/api/contest/?page=${pageNumber}&limit=100&search=${debouncedSearch}&origin=${platform}&upcoming=true`
+      );
+      setUpcomingContest(response.data.contests);
+      setLastUpdatedAt(response.data.lastUpdatedAt);
+    } catch (error) {
+      console.error(error);
+    } finally {
+      if (isInitial) {
+        setInitialLoading(false);
+      } else {
+        setLoading(false);
+      }
+    }
+  };
+
   useEffect(() => {
     fetchContest(1, true);
+    fetchUpcomingContests();
     fetchVisits();
     const savedBookmarks = JSON.parse(
       localStorage.getItem("bookmarkedContests") || "[]"
@@ -259,16 +283,6 @@ const Home = () => {
     } else {
       return `${formatDistanceToNow(addMinutes(addHours(end, -5), -30))} ago`;
     }
-  };
-
-  const getCurrentPassed = (contest: Contest) => {
-    const now = addMinutes(addHours(new Date(), 5), 30);
-    const end = new Date(contest.contest_date_end);
-
-    if (now > end) {
-      return false;
-    }
-    return true;
   };
 
   const getLiveContest = (contest: Contest) => {
@@ -367,7 +381,7 @@ const Home = () => {
   }, [showBookmarked]);
 
   if (initialLoading) {
-    return <Loading />;
+    return <LoadingNew />;
   }
 
   return (
@@ -379,58 +393,9 @@ const Home = () => {
           >
             Contest Tracker Hub
           </h1>
-          <div className="hidden md:flex items-center justify-end gap-3">
-            <div className="relative">
-              <Input
-                placeholder="Search Contest"
-                value={search}
-                onChange={handleSearchChange}
-                className="pl-9 pr-12"
-                ref={searchRef}
-                disabled={loading}
-              />
-              <Search className="size-4 absolute top-1/2 -translate-1/2 left-5 text-gray-400" />
-              <span className="flex items-center absolute top-1/2 -translate-1/2 -right-2">
-                <span className="text-xs text-gray-500 dark:bg-gray-700 dark:text-gray-300 rounded px-1 py-0.5">
-                  Ctrl K
-                </span>
-              </span>
-            </div>
-            <Select
-              value={platform}
-              onValueChange={(
-                value:
-                  | "codeforces"
-                  | "codechef"
-                  | "leetcode"
-                  | "geeksforgeeks"
-                  | "atcoder"
-              ) => {
-                setPlatform(value);
-                setSearch("");
-                setDebouncedSearch("");
-              }}
-              disabled={loading}
-            >
-              <SelectTrigger className="sm:w-[180px]">
-                <SelectValue placeholder="Select Platform" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="codeforces">Codeforces</SelectItem>
-                <SelectItem value="codechef">CodeChef</SelectItem>
-                <SelectItem value="leetcode">Leetcode</SelectItem>
-                <SelectItem value="geeksforgeeks">GeeksforGeeks</SelectItem>
-                <SelectItem value="atcoder">AtCoder</SelectItem>
-              </SelectContent>
-            </Select>
-            <Button
-              onClick={() => setShowBookmarked(!showBookmarked)}
-              disabled={loading}
-            >
-              {showBookmarked ? "Show All" : "Show Bookmarked"}
-            </Button>
+          <div className="hidden md:flex items-center justify-end gap-3 py-4">
             <Button variant="secondary" title="Live users">
-              <Eye /> {liveUsers}
+              <Eye /> {liveUsers} LIVE
             </Button>
             <ModeToggle />
           </div>
@@ -452,25 +417,186 @@ const Home = () => {
             />
           </div>
         )}
+
+        <h2 className="text-4xl md:text-6xl font-medium py-16 md:py-20 text-center">
+          Upcoming Contests
+        </h2>
+
+        <Table className="border mt-6">
+          <TableCaption>
+            Contest List{" "}
+            <span className="text-xs text-gray-500">
+              (Last updated:{" "}
+              {new Date(lastUpdatedAt).toLocaleString("en-IN", {
+                year: "numeric",
+                month: "short",
+                day: "numeric",
+                hour: "2-digit",
+                minute: "2-digit",
+                timeZone: "UTC",
+              })}{" "}
+              IST)
+            </span>
+          </TableCaption>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Type/Platform</TableHead>
+              <TableHead>Contest Name</TableHead>
+              <TableHead>Start Date & Time</TableHead>
+              <TableHead>Duration</TableHead>
+              <TableHead>End Date & Time</TableHead>
+              <TableHead>Time remaining</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {upcomingContest.map((contest) => {
+              return (
+                <TableRow key={contest.contest_id}>
+                  <TableCell
+                    className="flex gap-2 items-center"
+                    title={contest.contest_origin}
+                  >
+                    <Image
+                      height={14}
+                      width={14}
+                      src={platformIcon(contest.contest_origin)}
+                      alt={contest.contest_origin}
+                      draggable={false}
+                      className={`${
+                        contest.contest_origin === "codechef" && "dark:invert"
+                      } ${
+                        contest.contest_origin === "atcoder" && "dark:invert"
+                      } ${
+                        contest.contest_origin === "geeksforgeeks" &&
+                        "dark:invert"
+                      }`}
+                    />
+                    {contest.contest_type}
+                    {getLiveContest(contest) && (
+                      <span className="text-xs uppercase bg-white text-red-500 border border-red-500 px-3 py-0.5 mr-3 rounded-2xl font-medium">
+                        Live
+                      </span>
+                    )}
+                  </TableCell>
+                  <TableCell>
+                    <Link
+                      href={contestLink(
+                        contest.contest_origin,
+                        contest.contest_id
+                      )}
+                      target="_blank"
+                      className="hover:underline flex items-center gap-2"
+                      title="Visit Contest"
+                    >
+                      {contest.contest_name}
+                      <ExternalLink className="stroke-1 size-4" />
+                    </Link>
+                  </TableCell>
+                  <TableCell>
+                    {new Date(contest.contest_date_start).toLocaleString(
+                      "en-IN",
+                      {
+                        year: "numeric",
+                        month: "short",
+                        day: "numeric",
+                        hour: "2-digit",
+                        minute: "2-digit",
+                        timeZone: "UTC",
+                      }
+                    )}
+                  </TableCell>
+                  <TableCell>
+                    {Math.round(
+                      Math.abs(
+                        new Date(contest.contest_date_end).getTime() -
+                          new Date(contest.contest_date_start).getTime()
+                      ) /
+                        (1000 * 60 * 60)
+                    )}{" "}
+                    hours
+                  </TableCell>
+                  <TableCell>
+                    {new Date(contest.contest_date_end).toLocaleString(
+                      "en-IN",
+                      {
+                        year: "numeric",
+                        month: "short",
+                        day: "numeric",
+                        hour: "2-digit",
+                        minute: "2-digit",
+                        timeZone: "UTC",
+                      }
+                    )}
+                  </TableCell>
+                  <TableCell>{getTimeRemaining(contest)}</TableCell>
+                </TableRow>
+              );
+            })}
+          </TableBody>
+        </Table>
+
+        <h2 className="text-4xl md:text-6xl font-medium py-16 md:py-20 text-center">
+          Past Contests
+        </h2>
+
+        <div className="hidden md:flex items-center justify-end gap-3 py-4">
+          <div className="hidden md:flex items-center justify-end gap-3 py-4">
+            <Button
+              onClick={() => setShowBookmarked(!showBookmarked)}
+              disabled={loading}
+            >
+              {showBookmarked ? "Show All" : "Show Bookmarked"}
+            </Button>
+          </div>
+          <div className="relative">
+            <Input
+              placeholder="Search Contest"
+              value={search}
+              onChange={handleSearchChange}
+              className="pl-9 pr-12"
+              ref={searchRef}
+              disabled={loading}
+            />
+            <Search className="size-4 absolute top-1/2 -translate-1/2 left-5 text-gray-400" />
+            <span className="flex items-center absolute top-1/2 -translate-1/2 -right-2">
+              <span className="text-xs text-gray-500 dark:bg-gray-700 dark:text-gray-300 rounded px-1 py-0.5">
+                Ctrl K
+              </span>
+            </span>
+          </div>
+          <Select
+            value={platform}
+            onValueChange={(
+              value:
+                | "codeforces"
+                | "codechef"
+                | "leetcode"
+                | "geeksforgeeks"
+                | "atcoder"
+            ) => {
+              setPlatform(value);
+              setSearch("");
+              setDebouncedSearch("");
+            }}
+            disabled={loading}
+          >
+            <SelectTrigger className="sm:w-[180px]">
+              <SelectValue placeholder="Select Platform" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="codeforces">Codeforces</SelectItem>
+              <SelectItem value="codechef">CodeChef</SelectItem>
+              <SelectItem value="leetcode">Leetcode</SelectItem>
+              <SelectItem value="geeksforgeeks">GeeksforGeeks</SelectItem>
+              <SelectItem value="atcoder">AtCoder</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+
         {loading ? (
           <TableLoadingSkeleton />
         ) : filteredContests.length > 0 ? (
           <Table className="border">
-            <TableCaption>
-              Contest List{" "}
-              <span className="text-xs text-gray-500">
-                (Last updated:{" "}
-                {new Date(lastUpdatedAt).toLocaleString("en-IN", {
-                  year: "numeric",
-                  month: "short",
-                  day: "numeric",
-                  hour: "2-digit",
-                  minute: "2-digit",
-                  timeZone: "UTC",
-                })}{" "}
-                IST)
-              </span>
-            </TableCaption>
             <TableHeader>
               <TableRow>
                 <TableHead>Type/Platform</TableHead>
@@ -478,21 +604,14 @@ const Home = () => {
                 <TableHead>Start Date & Time</TableHead>
                 <TableHead>Duration</TableHead>
                 <TableHead>End Date & Time</TableHead>
-                <TableHead>Time remaining/passed</TableHead>
+                <TableHead>Time passed</TableHead>
                 <TableHead className="text-center">Save</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {filteredContests.map((contest) => {
                 return (
-                  <TableRow
-                    key={contest.contest_id}
-                    className={cn(
-                      getCurrentPassed(contest)
-                        ? "bg-green-300 dark:bg-green-700"
-                        : "bg-red-300 dark:bg-red-700"
-                    )}
-                  >
+                  <TableRow key={contest.contest_id}>
                     <TableCell
                       className="flex gap-2 items-center"
                       title={contest.contest_origin}
@@ -514,7 +633,7 @@ const Home = () => {
                       />
                       {contest.contest_type}
                       {getLiveContest(contest) && (
-                        <span className="text-xs uppercase bg-white text-red-500 border border-red-500 px-3 py-0.5 rounded-2xl font-medium">
+                        <span className="text-xs uppercase bg-white text-red-500 border border-red-500 px-3 py-0.5 mr-3 rounded-2xl font-medium">
                           Live
                         </span>
                       )}
