@@ -170,7 +170,7 @@ const Register = () => {
                     disabled={loading}
                   />
                   <div
-                    className="absolute right-0 top-0 h-full px-3"
+                    className="absolute right-0 top-0 h-full px-3 flex items-center justify-center"
                     title={
                       usernameAvailable
                         ? "Username available"
