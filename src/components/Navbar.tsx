@@ -5,11 +5,12 @@ import { Comfortaa } from "next/font/google";
 import { io } from "socket.io-client";
 import axios from "axios";
 import { Eye, SquareChevronLeft } from "lucide-react";
-import { useLiveUsers, useOpen, useUser } from "@/store/useStore";
-import { ModeToggle } from "./theme-toggle";
+import Link from "next/link";
 import { Button } from "./ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
-import Link from "next/link";
+import { ModeToggle } from "./theme-toggle";
+import { useLiveUsers, useOpen } from "@/store/useStore";
+import { useUser } from "@/context/userContest";
 
 axios.defaults.baseURL = process.env.NEXT_PUBLIC_API_URL;
 
@@ -18,7 +19,7 @@ const comfortaa = Comfortaa({ subsets: ["latin"], weight: "700" });
 const Navbar = () => {
   const { liveUsers, setLiveUsers } = useLiveUsers();
   const { setOpen } = useOpen();
-  const { user } = useUser();
+  const { user, token } = useUser();
 
   useEffect(() => {
     const socketUrl = process.env.NEXT_PUBLIC_API_URL as string;
@@ -62,16 +63,20 @@ const Navbar = () => {
           <User /> {"100"} VISITS
         </Button> */}
         <ModeToggle />
-        {!user.token && (
+        {!token && !user && (
           <Link href="/login">
             <Button>Login</Button>
           </Link>
         )}
-        {user.token && (
-          <Avatar>
-            <AvatarImage src="https://github.com/shadcn.png" />
-            <AvatarFallback>SH</AvatarFallback>
-          </Avatar>
+        {token && user && (
+          <Link href={`/user/${user.username}`}>
+            <Avatar>
+              <AvatarImage src={user.profilePicture} />
+              <AvatarFallback>
+                {user.name.charAt(0).toUpperCase()}
+              </AvatarFallback>
+            </Avatar>
+          </Link>
         )}
       </div>
       <button className="flex md:hidden" onClick={() => setOpen(true)}>

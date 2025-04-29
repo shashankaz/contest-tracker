@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
-import FetchUser from "@/components/FetchUser";
+import { UserProvider } from "@/context/userContest";
 import { Toaster } from "react-hot-toast";
 import Script from "next/script";
 
@@ -78,10 +78,9 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          {children}
+          <UserProvider>{children}</UserProvider>
         </ThemeProvider>
         <Toaster position="top-center" reverseOrder={false} />
-        <FetchUser />
       </body>
       <Script
         id="website-schema"
