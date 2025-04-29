@@ -1,5 +1,9 @@
 "use client";
 
+import { useState } from "react";
+import axios from "axios";
+import toast from "react-hot-toast";
+
 import {
   Card,
   CardContent,
@@ -19,7 +23,46 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 
+axios.defaults.baseURL = process.env.NEXT_PUBLIC_API_URL;
+
 const Feedback = () => {
+  const [loading, setLoading] = useState(false);
+  const [form, setForm] = useState({
+    name: "",
+    email: "",
+    message: "",
+    type: "",
+  });
+
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
+    const { name, value } = e.target;
+    setForm((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    try {
+      setLoading(true);
+      const response = await axios.post("/api/feedback", form);
+      if (response.status === 201) {
+        toast.success("Feedback sent successfully!");
+        setForm({
+          name: "",
+          email: "",
+          message: "",
+          type: "",
+        });
+      }
+    } catch (error) {
+      console.error(error);
+      toast.error("Failed to send feedback. Please try again later.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <div className="min-h-screen flex items-center justify-center">
       <div className="w-full max-w-md px-4">
@@ -31,10 +74,17 @@ const Feedback = () => {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <form action="" className="space-y-4">
+            <form onSubmit={handleSubmit} className="space-y-4">
               <div className="space-y-2">
                 <Label htmlFor="name">Name</Label>
-                <Input id="name" placeholder="John Doe" />
+                <Input
+                  id="name"
+                  placeholder="John Doe"
+                  name="name"
+                  value={form.name}
+                  onChange={handleChange}
+                  disabled={loading}
+                />
               </div>
               <div className="space-y-2">
                 <Label htmlFor="email">Email</Label>
@@ -42,6 +92,10 @@ const Feedback = () => {
                   type="email"
                   id="email"
                   placeholder="johndoe@example.com"
+                  name="email"
+                  value={form.email}
+                  onChange={handleChange}
+                  disabled={loading}
                 />
               </div>
               <div className="space-y-2">
@@ -50,11 +104,20 @@ const Feedback = () => {
                   id="message"
                   placeholder="Type your message here..."
                   className="min-h-28"
+                  name="message"
+                  value={form.message}
+                  onChange={handleChange}
+                  disabled={loading}
                 />
               </div>
               <div className="space-y-2">
                 <Label htmlFor="type">Type</Label>
-                <Select>
+                <Select
+                  onValueChange={(value) =>
+                    setForm((prev) => ({ ...prev, type: value }))
+                  }
+                  disabled={loading}
+                >
                   <SelectTrigger className="w-full" id="type">
                     <SelectValue placeholder="Select a type" />
                   </SelectTrigger>
@@ -64,7 +127,9 @@ const Feedback = () => {
                   </SelectContent>
                 </Select>
               </div>
-              <Button className="w-full">Send Message</Button>
+              <Button type="submit" className="w-full" disabled={loading}>
+                {loading ? "Sending..." : "Send Feedback"}
+              </Button>
             </form>
           </CardContent>
         </Card>
