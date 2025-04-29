@@ -725,7 +725,7 @@ const Home = () => {
           </div>
         )}
         {emailPopupOpen && (
-          <div className="h-screen fixed inset-0 flex items-center justify-center bg-black/50 z-20">
+          <div className="h-screen fixed inset-0 flex items-center justify-center bg-black/50 z-20 px-4">
             <Newsletter
               setEmailPopupOpen={setEmailPopupOpen}
               subscribeEmail={subscribeEmail}
