@@ -69,7 +69,7 @@ const Navbar = () => {
           </Link>
         )}
         {token && user && (
-          <Link href={`/user/${user.username}`}>
+          <Link href="/profile">
             <Avatar>
               <AvatarImage src={user.profilePicture} />
               <AvatarFallback>
