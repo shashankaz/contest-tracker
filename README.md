@@ -13,14 +13,6 @@ Contest Tracker is an online tool designed to help users easily manage and keep 
 - **Utilities**: date-fns, clsx
 - **Cache**: Redis, localStorage
 
-## Demo Video
-
-You can watch the live demo of the application by clicking [here](https://www.loom.com/share/71d3203053d041ddbec9bc8c7aa87ac9?sid=b98d7396-dbe5-427b-b279-591605b109c8).
-
-## Live Preview
-
-The Contest Tracker application is deployed on Vercel and can be accessed [here](https://contest-tracker-hub.vercel.app).
-
 ## Application Features
 
 ### Routes
