@@ -23,9 +23,6 @@ const Newsletter = ({ setEmailPopupOpen, subscribeEmail }: NewsletterProps) => {
     try {
       setLoading(true);
       subscribeEmail(email);
-      setEmailPopupOpen(false);
-      toast.success("Subscribed to newsletter");
-      Cookies.set("emailSubscribed", "true");
     } catch (error) {
       console.error(error);
     } finally {

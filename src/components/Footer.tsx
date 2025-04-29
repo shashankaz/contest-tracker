@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import Cookies from "js-cookie";
 import toast from "react-hot-toast";
 
 import { Input } from "./ui/input";
@@ -25,8 +24,6 @@ const Footer: React.FC<FooterProps> = ({ subscribeEmail }) => {
     try {
       setLoading(true);
       subscribeEmail(email);
-      toast.success("Subscribed to newsletter");
-      Cookies.set("emailSubscribed", "true");
       setEmail("");
     } catch (error) {
       toast.error("Subscription failed. Please try again.");

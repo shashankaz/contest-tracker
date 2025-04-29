@@ -106,7 +106,17 @@ const Home = () => {
 
   const subscribeEmail = async (email: string) => {
     try {
-      await axios.post(`/api/newsletter/subscribe?email=${email}`);
+      const response = await axios.post(
+        `/api/newsletter/subscribe?email=${email}`
+      );
+
+      if (response.status === 201) {
+        toast.success("Subscribed to newsletter");
+        setEmailPopupOpen(false);
+        Cookies.set("emailSubscribed", "true");
+      } else {
+        toast.error("Subscription failed. Please try again.");
+      }
     } catch (error) {
       console.error(error);
     }
