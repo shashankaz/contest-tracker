@@ -44,6 +44,14 @@ export const metadata: Metadata = {
     siteName: "Contest Tracker",
     url: "https://contest-tracker-hub.vercel.app",
     type: "website",
+    images: [
+      {
+        url: "/cover.png",
+        width: 1200,
+        height: 630,
+        alt: "Contest Tracker Hub Cover",
+      },
+    ],
   },
 };
 
