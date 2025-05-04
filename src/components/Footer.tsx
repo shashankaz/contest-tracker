@@ -35,7 +35,7 @@ const Footer: React.FC<FooterProps> = ({ subscribeEmail }) => {
 
   return (
     <div className="dark:bg-white/10 mb-4 md:mb-10 rounded-xl p-6 md:p-8 mt-20 border dark:border-white/10">
-      <div className="mb-4 flex flex-col md:flex-row items-center justify-between gap-8 md:gap-20">
+      <div className="mb-4 flex flex-col md:flex-row items-start justify-between gap-8 md:gap-20">
         <div className="w-full md:w-1/3">
           <h2 className="text-2xl sm:text-3xl font-semibold mb-2">
             Contest Tracker Hub
@@ -78,7 +78,17 @@ const Footer: React.FC<FooterProps> = ({ subscribeEmail }) => {
             </li>
             <li>
               <Link href="/docs" className="hover:underline">
-                Docs
+                API Docs
+              </Link>
+            </li>
+            <li>
+              <Link href="/faq" className="hover:underline">
+                FAQ
+              </Link>
+            </li>
+            <li>
+              <Link href="/privacy-policy" className="hover:underline">
+                Privacy Policy
               </Link>
             </li>
             <li>

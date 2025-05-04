@@ -50,11 +50,13 @@ const Navbar = () => {
 
   return (
     <div className="flex items-center justify-between h-20 border-b">
-      <h1
-        className={`text-2xl md:text-4xl font-semibold ${comfortaa.className}`}
-      >
-        Contest Tracker Hub
-      </h1>
+      <Link href="/">
+        <h1
+          className={`text-2xl md:text-4xl font-semibold ${comfortaa.className}`}
+        >
+          Contest Tracker Hub
+        </h1>
+      </Link>
       <div className="hidden md:flex items-center justify-end gap-3 py-4">
         <Button variant="secondary" title="Live users">
           <Eye /> {liveUsers} LIVE
