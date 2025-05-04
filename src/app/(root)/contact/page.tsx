@@ -3,6 +3,7 @@
 import { useState } from "react";
 import axios from "axios";
 import toast from "react-hot-toast";
+import { Loader2 } from "lucide-react";
 
 import {
   Card,
@@ -104,7 +105,14 @@ const ContactUs = () => {
                 />
               </div>
               <Button type="submit" className="w-full" disabled={loading}>
-                {loading ? "Sending..." : "Send"}
+                {loading ? (
+                  <p className="flex items-center gap-2">
+                    Sending
+                    <Loader2 className="h-8 w-8 animate-spin" />
+                  </p>
+                ) : (
+                  <p>Send</p>
+                )}
               </Button>
             </form>
           </CardContent>

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Eye, EyeOff } from "lucide-react";
+import { Eye, EyeOff, Loader2 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import axios from "axios";
@@ -149,7 +149,14 @@ const Login = () => {
                 className="w-full"
                 disabled={handleDisable() || loading}
               >
-                {loading ? "Logging in..." : "Login"}
+                {loading ? (
+                  <p className="flex items-center gap-2">
+                    Logging in
+                    <Loader2 className="h-8 w-8 animate-spin" />
+                  </p>
+                ) : (
+                  <p>Login</p>
+                )}
               </Button>
             </form>
           </CardContent>

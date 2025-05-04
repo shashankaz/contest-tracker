@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Check, Eye, EyeOff, X } from "lucide-react";
+import { Check, Eye, EyeOff, Loader2, X } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import axios from "axios";
@@ -235,7 +235,14 @@ const Register = () => {
                 className="w-full"
                 disabled={handleDisabled() || loading}
               >
-                {loading ? "Registering..." : "Register"}
+                {loading ? (
+                  <p className="flex items-center gap-2">
+                    Registering
+                    <Loader2 className="h-8 w-8 animate-spin" />
+                  </p>
+                ) : (
+                  <p>Register</p>
+                )}
               </Button>
             </form>
           </CardContent>
