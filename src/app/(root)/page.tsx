@@ -3,7 +3,7 @@
 import { useEffect, useState, useMemo, useRef } from "react";
 import Image from "next/image";
 import axios from "axios";
-import { ExternalLink, Search } from "lucide-react";
+import { Bookmark, BookmarkCheck, ExternalLink, Search } from "lucide-react";
 import { addHours, addMinutes, formatDistanceToNow } from "date-fns";
 import Link from "next/link";
 import { debounce } from "lodash";
@@ -564,7 +564,16 @@ const Home = () => {
             onClick={() => setShowBookmarked(!showBookmarked)}
             disabled={loading}
           >
-            {showBookmarked ? "Show All" : "Show Bookmarked"}
+            {showBookmarked ? (
+              <p className="flex items-center gap-2">
+                <Bookmark className="size-4" /> Show All
+              </p>
+            ) : (
+              <p className="flex items-center gap-2">
+                <BookmarkCheck className="size-4" />
+                Show Saved
+              </p>
+            )}
           </Button>
         </div>
 
@@ -698,7 +707,7 @@ const Home = () => {
           <div className="flex flex-col items-center justify-center py-10">
             {showBookmarked ? (
               <span className="text-xl text-center">
-                No bookmarked contests found.
+                No saved contests found.
               </span>
             ) : (
               <span className="text-xl text-center">
