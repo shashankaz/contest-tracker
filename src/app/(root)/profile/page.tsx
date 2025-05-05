@@ -16,6 +16,8 @@ import {
   User,
   Key,
 } from "lucide-react";
+import Link from "next/link";
+import toast from "react-hot-toast";
 
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
@@ -54,7 +56,6 @@ import { Skeleton } from "@/components/ui/skeleton";
 import EditProfile from "./_components/EditProfile";
 import Navbar from "@/components/Navbar";
 import { useUser } from "@/context/userContest";
-import Link from "next/link";
 
 interface UserProfileType {
   name: string;
@@ -192,6 +193,28 @@ const UserProfile = () => {
       console.error(error);
     } finally {
       setPasswordLoading(false);
+    }
+  };
+
+  const handleAccountDelete = async () => {
+    try {
+      setLoading(true);
+      const response = await axios.get("/api/user/delete-account", {
+        headers: {
+          Authorization: `Bearer ${Cookies.get("token")}`,
+        },
+      });
+
+      if (response.status === 200) {
+        toast.success("Account deleted successfully!");
+        handleLogout();
+      } else {
+        toast.error("Failed to delete account. Please try again later.");
+      }
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -522,14 +545,18 @@ const UserProfile = () => {
                           Are you absolutely sure?
                         </AlertDialogTitle>
                         <AlertDialogDescription>
-                          This action cannot be undone. This will permanently
-                          delete your account and remove all your data from our
-                          servers.
+                          Please note: This action is final. Your account and
+                          all related data will be permanently removed from our
+                          servers. You will not be able to register a new
+                          account using the same email address.
                         </AlertDialogDescription>
                       </AlertDialogHeader>
                       <AlertDialogFooter>
                         <AlertDialogCancel>Cancel</AlertDialogCancel>
-                        <AlertDialogAction className="bg-destructive text-white">
+                        <AlertDialogAction
+                          onClick={handleAccountDelete}
+                          className="bg-destructive hover:bg-destructive/90 text-white"
+                        >
                           Delete Account
                         </AlertDialogAction>
                       </AlertDialogFooter>
