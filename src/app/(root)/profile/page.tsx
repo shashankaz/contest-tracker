@@ -19,6 +19,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import toast from "react-hot-toast";
+import { addHours, addMinutes } from "date-fns";
 
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
@@ -57,13 +58,16 @@ import { Skeleton } from "@/components/ui/skeleton";
 import EditProfile from "./_components/EditProfile";
 import Navbar from "@/components/Navbar";
 import { useUser } from "@/context/userContest";
+import { contestLink } from "@/lib/contestLink";
 
 interface Contest {
-  id: string;
-  name: string;
-  platform: string;
-  startTime: string;
-  endTime: string;
+  contest_id: string;
+  contest_name: string;
+  contest_type: string;
+  contest_phase: number;
+  contest_date_start: string;
+  contest_date_end: string;
+  contest_origin: string;
 }
 
 const UserProfile = () => {
@@ -83,45 +87,12 @@ const UserProfile = () => {
   const fetchSavedContests = async () => {
     try {
       setContestsLoading(true);
-      const mockContests = [
-        {
-          id: "1",
-          name: "Weekly Contest 345",
-          platform: "LeetCode",
-          startTime: "2023-05-20T14:30:00Z",
-          endTime: "2023-05-20T16:30:00Z",
+      const response = await axios.get("/api/user/saved-contests", {
+        headers: {
+          Authorization: `Bearer ${Cookies.get("token")}`,
         },
-        {
-          id: "2",
-          name: "Codeforces Round #835",
-          platform: "Codeforces",
-          startTime: "2023-05-22T17:35:00Z",
-          endTime: "2023-05-22T19:35:00Z",
-        },
-        {
-          id: "3",
-          name: "May Long Challenge",
-          platform: "CodeChef",
-          startTime: "2023-05-05T15:00:00Z",
-          endTime: "2023-05-15T15:00:00Z",
-        },
-        {
-          id: "4",
-          name: "AtCoder Beginner Contest 301",
-          platform: "AtCoder",
-          startTime: "2023-05-27T12:00:00Z",
-          endTime: "2023-05-27T13:40:00Z",
-        },
-        {
-          id: "5",
-          name: "Biweekly Contest 103",
-          platform: "LeetCode",
-          startTime: "2023-05-13T14:30:00Z",
-          endTime: "2023-05-13T16:30:00Z",
-        },
-      ];
-
-      setSavedContests(mockContests);
+      });
+      setSavedContests(response.data);
     } catch (error) {
       console.error(error);
     } finally {
@@ -146,8 +117,37 @@ const UserProfile = () => {
     router.push("/");
   };
 
-  const handleDeleteContest = (id: string) => {
-    setSavedContests(savedContests.filter((contest) => contest.id !== id));
+  const handleDeleteContest = async (contest_id: string) => {
+    try {
+      const response = await axios.delete(
+        `/api/user/delete-contest/?contestId=${contest_id}`,
+        {
+          headers: {
+            Authorization: `Bearer ${Cookies.get("token")}`,
+          },
+        }
+      );
+
+      if (response.status === 200) {
+        toast.success("Contest removed from bookmarks");
+        let updatedBookmarks = JSON.parse(
+          localStorage.getItem("bookmarkedContests") || "[]"
+        );
+        updatedBookmarks = updatedBookmarks.filter(
+          (bookmarkId: string) => bookmarkId !== contest_id
+        );
+        setSavedContests(updatedBookmarks);
+        localStorage.setItem(
+          "bookmarkedContests",
+          JSON.stringify(updatedBookmarks)
+        );
+      } else {
+        toast.error("Failed to remove contest. Please try again later.");
+      }
+    } catch (error) {
+      console.error(error);
+      toast.error("Failed to remove contest. Please try again later.");
+    }
   };
 
   const handleContestsAlert = async (checked: boolean) => {
@@ -256,14 +256,17 @@ const UserProfile = () => {
     }
   };
 
-  const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
+  const formatDate = (date: Date) => {
     return date.toLocaleString("en-US", {
       month: "short",
       day: "numeric",
       hour: "2-digit",
       minute: "2-digit",
     });
+  };
+
+  const adjustDate = (dateString: string) => {
+    return addMinutes(addHours(new Date(dateString), -5), -30);
   };
 
   if (!user) {
@@ -362,16 +365,16 @@ const UserProfile = () => {
                 </div>
               ) : savedContests.length > 0 ? (
                 <div className="grid gap-4 sm:grid-cols-2">
-                  {savedContests.map((contest) => (
-                    <Card key={contest.id} className="overflow-hidden">
+                  {savedContests.map((contest, index) => (
+                    <Card key={index} className="overflow-hidden">
                       <CardHeader>
                         <div className="flex justify-between items-start">
                           <div>
                             <CardTitle className="text-base">
-                              {contest.name}
+                              {contest.contest_name}
                             </CardTitle>
-                            <CardDescription>
-                              {contest.platform}
+                            <CardDescription className="capitalize">
+                              {contest.contest_origin}
                             </CardDescription>
                           </div>
                           <AlertDialog>
@@ -398,7 +401,7 @@ const UserProfile = () => {
                                 <AlertDialogCancel>Cancel</AlertDialogCancel>
                                 <AlertDialogAction
                                   onClick={() =>
-                                    handleDeleteContest(contest.id)
+                                    handleDeleteContest(contest.contest_id)
                                   }
                                 >
                                   Remove
@@ -410,15 +413,30 @@ const UserProfile = () => {
                       </CardHeader>
                       <CardContent>
                         <div className="text-sm">
-                          <p>Start: {formatDate(contest.startTime)}</p>
-                          <p>End: {formatDate(contest.endTime)}</p>
+                          <p>
+                            Start:{" "}
+                            {formatDate(adjustDate(contest.contest_date_start))}
+                          </p>
+                          <p>
+                            End:{" "}
+                            {formatDate(adjustDate(contest.contest_date_end))}
+                          </p>
                         </div>
                       </CardContent>
                       <CardFooter className="flex justify-end">
-                        <Button variant="outline" size="sm">
-                          <ExternalLink className="mr-1 h-3 w-3" />
-                          Visit
-                        </Button>
+                        <Link
+                          href={contestLink(
+                            contest.contest_origin,
+                            contest.contest_id
+                          )}
+                          target="_blank"
+                          title="Visit Contest"
+                        >
+                          <Button variant="outline" size="sm">
+                            <ExternalLink className="mr-1 h-3 w-3" />
+                            Visit
+                          </Button>
+                        </Link>
                       </CardFooter>
                     </Card>
                   ))}
@@ -428,9 +446,11 @@ const UserProfile = () => {
                   <p className="text-muted-foreground">
                     No saved contests found
                   </p>
-                  <Button variant="outline" className="mt-4">
-                    Browse Contests
-                  </Button>
+                  <Link href="/">
+                    <Button variant="outline" className="mt-4">
+                      Browse Contests
+                    </Button>
+                  </Link>
                 </div>
               )}
             </CardContent>

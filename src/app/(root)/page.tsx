@@ -35,6 +35,7 @@ import TableLoadingSkeleton from "@/components/TableLoadingSkeleton";
 import LoadingNew from "@/components/LoadingNew";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import { contestLink } from "@/lib/contestLink";
 
 axios.defaults.baseURL = process.env.NEXT_PUBLIC_API_URL;
 
@@ -234,23 +235,6 @@ const Home = () => {
     }
   }, [platform, debouncedSearch]);
 
-  const contestLink = (platform: string, contest_id: string) => {
-    switch (platform) {
-      case "codeforces":
-        return `https://codeforces.com/contests/${contest_id}`;
-      case "codechef":
-        return `https://www.codechef.com/${contest_id}`;
-      case "leetcode":
-        return `https://leetcode.com/contest/${contest_id}`;
-      case "geeksforgeeks":
-        return `https://practice.geeksforgeeks.org/contest/${contest_id}`;
-      case "atcoder":
-        return `https://atcoder.jp/contests/${contest_id}`;
-      default:
-        return "";
-    }
-  };
-
   const platformIcon = (platform: string) => {
     switch (platform) {
       case "codeforces":
@@ -316,16 +300,63 @@ const Home = () => {
     setOpen(false);
   }, [platform, showBookmarked]);
 
-  const handleBookmark = (id: string) => {
-    let updatedBookmarks = [...bookmarkedContests];
-    if (bookmarkedContests.includes(id)) {
-      updatedBookmarks = updatedBookmarks.filter(
-        (bookmarkId) => bookmarkId !== id
+  const saveBookmark = async (contestDetails: Contest) => {
+    try {
+      const response = await axios.post(
+        "/api/user/save-contest",
+        {
+          contestDetails,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${Cookies.get("token")}`,
+          },
+        }
       );
-      toast.success("Contest removed from bookmarks");
+
+      if (response.status === 200) {
+        toast.success("Contest added to bookmarks");
+      } else {
+        toast.error("Failed to save bookmarks. Please try again later.");
+      }
+    } catch (error) {
+      console.error(error);
+      toast.error("Failed to save bookmarks. Please try again later.");
+    }
+  };
+
+  const deleteBookmark = async (contestDetails: Contest) => {
+    try {
+      const response = await axios.delete(
+        `/api/user/delete-contest/?contestId=${contestDetails.contest_id}`,
+        {
+          headers: {
+            Authorization: `Bearer ${Cookies.get("token")}`,
+          },
+        }
+      );
+
+      if (response.status === 200) {
+        toast.success("Contest removed from bookmarks");
+      } else {
+        toast.error("Failed to remove contest. Please try again later.");
+      }
+    } catch (error) {
+      console.error(error);
+      toast.error("Failed to remove contest. Please try again later.");
+    }
+  };
+
+  const handleBookmark = (contest: Contest) => {
+    let updatedBookmarks = [...bookmarkedContests];
+    if (bookmarkedContests.includes(contest.contest_id)) {
+      updatedBookmarks = updatedBookmarks.filter(
+        (bookmarkId) => bookmarkId !== contest.contest_id
+      );
+      deleteBookmark(contest);
     } else {
-      updatedBookmarks.push(id);
-      toast.success("Contest added to bookmarks");
+      updatedBookmarks.push(contest.contest_id);
+      saveBookmark(contest);
     }
     setBookmarkedContests(updatedBookmarks);
     localStorage.setItem(
@@ -675,7 +706,7 @@ const Home = () => {
                     <TableCell>{getTimeRemaining(contest)}</TableCell>
                     <TableCell className="text-center">
                       <button
-                        onClick={() => handleBookmark(contest.contest_id)}
+                        onClick={() => handleBookmark(contest)}
                         title="Bookmark contest"
                         className="hover:cursor-pointer px-3"
                       >
