@@ -70,6 +70,7 @@ const Register = () => {
           name: response.data.user.name,
           username: response.data.user.username,
           email: response.data.user.email,
+          bio: response.data.bio,
           profilePicture: response.data.user.profilePicture,
           newsletterSubscribed: response.data.user.newsletterSubscribed,
         });
