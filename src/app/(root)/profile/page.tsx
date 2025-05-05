@@ -54,6 +54,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import EditProfile from "./_components/EditProfile";
 import Navbar from "@/components/Navbar";
 import { useUser } from "@/context/userContest";
+import Link from "next/link";
 
 interface UserProfileType {
   name: string;
@@ -503,9 +504,11 @@ const UserProfile = () => {
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                  <Button variant="outline" className="w-full">
-                    Forgot Password
-                  </Button>
+                  <Link href="/forgot-password">
+                    <Button variant="outline" className="w-full mb-4">
+                      Forgot Password
+                    </Button>
+                  </Link>
 
                   <AlertDialog>
                     <AlertDialogTrigger asChild>
