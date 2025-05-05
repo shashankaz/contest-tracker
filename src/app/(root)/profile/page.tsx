@@ -84,7 +84,7 @@ const UserProfile = () => {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [passwordLoading, setPasswordLoading] = useState(false);
 
-  const { setUser, setToken } = useUser();
+  const { user, setUser, setToken } = useUser();
   const router = useRouter();
   // const params = useParams();
 
@@ -174,6 +174,35 @@ const UserProfile = () => {
 
   const handleDeleteContest = (id: string) => {
     setSavedContests(savedContests.filter((contest) => contest.id !== id));
+  };
+
+  const handleContestsAlert = async (checked: boolean) => {
+    try {
+      const response = await axios.post(
+        "/api/user/update-preferences",
+        {
+          preferences: { newsletterSubscribed: checked },
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${Cookies.get("token")}`,
+          },
+        }
+      );
+
+      if (response.status === 200) {
+        toast.success("Contest alerts updated");
+        setUser({
+          ...user!,
+          newsletterSubscribed: checked,
+        });
+      } else {
+        toast.error("Failed to update contest alerts. Please try again later.");
+      }
+    } catch (error) {
+      console.error(error);
+      toast.error("Failed to update contest alerts. Please try again later.");
+    }
   };
 
   const handleResetPassword = async (e: React.FormEvent) => {
@@ -449,12 +478,18 @@ const UserProfile = () => {
                   <Label htmlFor="contest-alerts" className="flex-1">
                     Contest alerts
                   </Label>
-                  <Switch id="contest-alerts" defaultChecked />
+                  <Switch
+                    id="contest-alerts"
+                    checked={user ? user.newsletterSubscribed : false}
+                    onCheckedChange={handleContestsAlert}
+                  />
                 </div>
 
                 <div>
-                  <h4 className="font-medium text-sm mb-3">Reminder timing</h4>
-                  <Select defaultValue="3hrs">
+                  <h4 className="font-medium text-sm mb-3">
+                    Reminder timing (Coming soon)
+                  </h4>
+                  <Select defaultValue="3hrs" disabled>
                     <SelectTrigger className="w-full">
                       <SelectValue placeholder="Select reminder time" />
                     </SelectTrigger>
@@ -471,7 +506,9 @@ const UserProfile = () => {
                 </div>
 
                 <div>
-                  <h4 className="font-medium text-sm mb-3">Platforms</h4>
+                  <h4 className="font-medium text-sm mb-3">
+                    Platforms (Coming soon)
+                  </h4>
                   <div className="space-y-2">
                     {[
                       "Codeforces",
@@ -493,6 +530,7 @@ const UserProfile = () => {
                         <Checkbox
                           id={`platform-${platform.toLowerCase()}`}
                           defaultChecked
+                          disabled
                         />
                       </div>
                     ))}
