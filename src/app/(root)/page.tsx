@@ -426,16 +426,7 @@ const Home = () => {
         <Navbar />
         {open && (
           <div className="fixed inset-0 bg-black/50 z-10">
-            <OverLay
-              setOpen={setOpen}
-              showBookmarked={showBookmarked}
-              setShowBookmarked={setShowBookmarked}
-              platform={platform}
-              setPlatform={setPlatform}
-              liveUsers={liveUsers}
-              search={search}
-              handleSearchChange={handleSearchChange}
-            />
+            <OverLay setOpen={setOpen} liveUsers={liveUsers} />
           </div>
         )}
 
@@ -696,7 +687,7 @@ const Home = () => {
           </div>
         </div>
 
-        <div className="p-4 sm:p-6 md:p-8 lg:p-10 rounded-sm bg-gray-50 dark:bg-gray-900/30">
+        <div className="sm:p-6 md:p-8 lg:p-10 rounded-lg sm:bg-gray-50 sm:dark:bg-gray-900/30">
           <div>
             <h2 className="text-3xl md:text-4xl font-bold mb-8 text-center">
               Past Contests
@@ -709,82 +700,86 @@ const Home = () => {
                   <h3 className="text-lg font-medium">Filters</h3>
                 </div>
 
-                <div className="flex flex-wrap items-center gap-3 w-full md:w-auto">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={handleResetFilters}
-                    className="bg-white dark:bg-gray-800"
-                  >
-                    Reset Filters
-                  </Button>
+                <div className="flex flex-col md:flex-row items-center gap-3 w-full md:w-auto">
+                  <div className="flex items-center gap-3">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={handleResetFilters}
+                      className="bg-white dark:bg-gray-800"
+                    >
+                      Reset Filters
+                    </Button>
 
-                  <div className="relative flex-1 md:flex-none">
-                    <Input
-                      placeholder="Search Contest"
-                      value={search}
-                      onChange={handleSearchChange}
-                      className="pl-9 pr-12 bg-white dark:bg-gray-800 min-w-[250px]"
-                      ref={searchRef}
-                      disabled={loading}
-                    />
-                    <Search className="size-4 absolute top-1/2 -translate-y-1/2 left-3 text-gray-400" />
-                    <span className="flex items-center absolute top-1/2 -translate-y-1/2 right-3">
-                      <span className="text-xs bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400 rounded px-1.5 py-0.5">
-                        Ctrl K
+                    <div className="relative flex-1 md:flex-none">
+                      <Input
+                        placeholder="Search Contest"
+                        value={search}
+                        onChange={handleSearchChange}
+                        className="pl-9 pr-12 bg-white dark:bg-gray-800 min-w-[250px]"
+                        ref={searchRef}
+                        disabled={loading}
+                      />
+                      <Search className="size-4 absolute top-1/2 -translate-y-1/2 left-3 text-gray-400" />
+                      <span className="flex items-center absolute top-1/2 -translate-y-1/2 right-3">
+                        <span className="text-xs bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400 rounded px-1.5 py-0.5">
+                          Ctrl K
+                        </span>
                       </span>
-                    </span>
+                    </div>
                   </div>
 
-                  <Select
-                    value={platform}
-                    onValueChange={(
-                      value:
-                        | "codeforces"
-                        | "codechef"
-                        | "leetcode"
-                        | "geeksforgeeks"
-                        | "atcoder"
-                    ) => {
-                      setPlatform(value);
-                      setSearch("");
-                      setDebouncedSearch("");
-                    }}
-                    disabled={loading}
-                  >
-                    <SelectTrigger className="sm:w-[180px] bg-white dark:bg-gray-800">
-                      <SelectValue placeholder="Select Platform" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="codeforces">Codeforces</SelectItem>
-                      <SelectItem value="codechef">CodeChef</SelectItem>
-                      <SelectItem value="leetcode">Leetcode</SelectItem>
-                      <SelectItem value="geeksforgeeks">
-                        GeeksforGeeks
-                      </SelectItem>
-                      <SelectItem value="atcoder">AtCoder</SelectItem>
-                    </SelectContent>
-                  </Select>
+                  <div className="flex items-center gap-3">
+                    <Select
+                      value={platform}
+                      onValueChange={(
+                        value:
+                          | "codeforces"
+                          | "codechef"
+                          | "leetcode"
+                          | "geeksforgeeks"
+                          | "atcoder"
+                      ) => {
+                        setPlatform(value);
+                        setSearch("");
+                        setDebouncedSearch("");
+                      }}
+                      disabled={loading}
+                    >
+                      <SelectTrigger className="w-1/2 sm:w-[180px] bg-white dark:bg-gray-800">
+                        <SelectValue placeholder="Select Platform" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="codeforces">Codeforces</SelectItem>
+                        <SelectItem value="codechef">CodeChef</SelectItem>
+                        <SelectItem value="leetcode">Leetcode</SelectItem>
+                        <SelectItem value="geeksforgeeks">
+                          GeeksforGeeks
+                        </SelectItem>
+                        <SelectItem value="atcoder">AtCoder</SelectItem>
+                      </SelectContent>
+                    </Select>
 
-                  <Button
-                    onClick={() => setShowBookmarked(!showBookmarked)}
-                    disabled={loading}
-                    variant={showBookmarked ? "secondary" : "outline"}
-                    className={
-                      showBookmarked ? "" : "bg-white dark:bg-gray-800"
-                    }
-                  >
-                    {showBookmarked ? (
-                      <p className="flex items-center gap-2">
-                        <Bookmark className="size-4" /> Show All
-                      </p>
-                    ) : (
-                      <p className="flex items-center gap-2">
-                        <BookmarkCheck className="size-4" />
-                        Show Saved
-                      </p>
-                    )}
-                  </Button>
+                    <Button
+                      onClick={() => setShowBookmarked(!showBookmarked)}
+                      disabled={loading}
+                      variant={showBookmarked ? "secondary" : "outline"}
+                      className={`${
+                        showBookmarked ? "" : "bg-white dark:bg-gray-800"
+                      } w-1/2 sm:w-fit`}
+                    >
+                      {showBookmarked ? (
+                        <p className="flex items-center gap-2">
+                          <Bookmark className="size-4" /> Show All
+                        </p>
+                      ) : (
+                        <p className="flex items-center gap-2">
+                          <BookmarkCheck className="size-4" />
+                          Show Saved
+                        </p>
+                      )}
+                    </Button>
+                  </div>
                 </div>
               </div>
 

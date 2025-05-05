@@ -1,54 +1,16 @@
 import Link from "next/link";
-import {
-  Bookmark,
-  BookmarkCheck,
-  Eye,
-  Search,
-  SquareChevronRight,
-  User,
-} from "lucide-react";
+import { Eye, SquareChevronRight, User } from "lucide-react";
 
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { ModeToggle } from "./theme-toggle";
 import { useUser } from "@/context/userContest";
 
 interface OverLayProps {
   setOpen: (value: boolean) => void;
-  showBookmarked: boolean;
-  setShowBookmarked: (value: boolean) => void;
-  platform: string;
-  setPlatform: (
-    value:
-      | ""
-      | "codeforces"
-      | "codechef"
-      | "leetcode"
-      | "geeksforgeeks"
-      | "atcoder"
-  ) => void;
   liveUsers: number;
-  search: string;
-  handleSearchChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
 }
 
-const OverLay = ({
-  setOpen,
-  showBookmarked,
-  setShowBookmarked,
-  platform,
-  setPlatform,
-  liveUsers,
-  search,
-  handleSearchChange,
-}: OverLayProps) => {
+const OverLay = ({ setOpen, liveUsers }: OverLayProps) => {
   const { user, token } = useUser();
 
   return (
@@ -61,51 +23,7 @@ const OverLay = ({
           </button>
           <ModeToggle />
         </div>
-        <div className="flex flex-col gap-4">
-          <div className="relative">
-            <Input
-              placeholder="Search Contest"
-              value={search}
-              onChange={handleSearchChange}
-              className="pl-9"
-            />
-            <Search className="size-4 absolute top-1/2 -translate-1/2 left-5 text-gray-400" />
-          </div>
-          <Select
-            value={platform}
-            onValueChange={(
-              value:
-                | ""
-                | "codeforces"
-                | "codechef"
-                | "leetcode"
-                | "geeksforgeeks"
-                | "atcoder"
-            ) => setPlatform(value)}
-          >
-            <SelectTrigger className="w-full">
-              <SelectValue placeholder="Select Platform" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="codeforces">Codeforces</SelectItem>
-              <SelectItem value="codechef">CodeChef</SelectItem>
-              <SelectItem value="leetcode">Leetcode</SelectItem>
-              <SelectItem value="geeksforgeeks">GeeksforGeeks</SelectItem>
-              <SelectItem value="atcoder">AtCoder</SelectItem>
-            </SelectContent>
-          </Select>
-          <Button onClick={() => setShowBookmarked(!showBookmarked)}>
-            {showBookmarked ? (
-              <p className="flex items-center gap-2">
-                <Bookmark className="size-4" /> Show All
-              </p>
-            ) : (
-              <p className="flex items-center gap-2">
-                <BookmarkCheck className="size-4" />
-                Show Saved
-              </p>
-            )}
-          </Button>
+        <div className="grid grid-cols-2 gap-4">
           <Button variant="secondary" title="Live users">
             <Eye /> {liveUsers} LIVE
           </Button>

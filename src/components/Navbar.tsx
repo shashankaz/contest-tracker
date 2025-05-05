@@ -49,7 +49,7 @@ const Navbar = () => {
   }, []);
 
   return (
-    <div className="flex items-center justify-between h-20 border-b">
+    <div className="flex items-center justify-between h-20">
       <Link href="/">
         <h1
           className={`text-2xl md:text-4xl font-semibold ${comfortaa.className}`}
