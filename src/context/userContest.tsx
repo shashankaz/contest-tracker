@@ -19,6 +19,7 @@ interface User {
   name: string;
   username: string;
   email: string;
+  bio: string;
   profilePicture: string;
   newsletterSubscribed: boolean;
 }
@@ -63,6 +64,7 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
             name: user.name,
             username: user.username,
             email: user.email,
+            bio: user.bio,
             profilePicture: user.profilePicture,
             newsletterSubscribed: user.newsletterSubscribed,
           });

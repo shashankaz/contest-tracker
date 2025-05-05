@@ -58,13 +58,6 @@ import EditProfile from "./_components/EditProfile";
 import Navbar from "@/components/Navbar";
 import { useUser } from "@/context/userContest";
 
-interface UserProfileType {
-  name: string;
-  username: string;
-  bio: string;
-  profilePicture: string;
-}
-
 interface Contest {
   id: string;
   name: string;
@@ -74,8 +67,7 @@ interface Contest {
 }
 
 const UserProfile = () => {
-  const [userProfile, setUserProfile] = useState<UserProfileType | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [editProfile, setEditProfile] = useState(false);
   const [savedContests, setSavedContests] = useState<Contest[]>([]);
   const [contestsLoading, setContestsLoading] = useState(true);
@@ -87,23 +79,6 @@ const UserProfile = () => {
   const { user, setUser, setToken } = useUser();
   const router = useRouter();
   // const params = useParams();
-
-  const fetchUserProfile = async () => {
-    try {
-      setLoading(true);
-      const response = await axios.get(`/api/user/profile`, {
-        headers: {
-          Authorization: `Bearer ${Cookies.get("token")}`,
-        },
-      });
-
-      setUserProfile(response.data);
-    } catch (error) {
-      console.error(error);
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const fetchSavedContests = async () => {
     try {
@@ -161,7 +136,6 @@ const UserProfile = () => {
       return;
     }
 
-    fetchUserProfile();
     fetchSavedContests();
   }, []);
 
@@ -292,7 +266,7 @@ const UserProfile = () => {
     });
   };
 
-  if (loading) {
+  if (!user) {
     return (
       <div className="min-h-screen px-4 sm:px-6 md:px-8 lg:px-10">
         <Navbar />
@@ -313,6 +287,10 @@ const UserProfile = () => {
     );
   }
 
+  if (loading) {
+    return null;
+  }
+
   return (
     <div className="min-h-screen px-4 sm:px-6 md:px-8 lg:px-10 pb-10">
       <Navbar />
@@ -322,8 +300,7 @@ const UserProfile = () => {
           <div className="size-32 rounded-full overflow-hidden">
             <Image
               src={
-                userProfile?.profilePicture ||
-                "/placeholder.svg?height=128&width=128"
+                user?.profilePicture || "/placeholder.svg?height=128&width=128"
               }
               alt="Profile Picture"
               width={128}
@@ -333,11 +310,9 @@ const UserProfile = () => {
             />
           </div>
           <div className="text-center sm:text-left">
-            <h2 className="text-2xl font-bold">{userProfile?.name}</h2>
-            <p className="text-muted-foreground">@{userProfile?.username}</p>
-            <p className="mt-2 max-w-md">
-              {userProfile?.bio || "No bio available"}
-            </p>
+            <h2 className="text-2xl font-bold">{user?.name}</h2>
+            <p className="text-muted-foreground">@{user?.username}</p>
+            <p className="mt-2 max-w-md">{user?.bio || "No bio available"}</p>
             <div className="mt-4 flex flex-wrap gap-2 justify-center sm:justify-start">
               <Button onClick={() => setEditProfile(true)} size="sm">
                 <User className="size-4" />

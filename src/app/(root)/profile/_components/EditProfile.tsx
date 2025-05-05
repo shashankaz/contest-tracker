@@ -1,3 +1,10 @@
+import { useEffect, useState } from "react";
+import Image from "next/image";
+import axios from "axios";
+import Cookies from "js-cookie";
+import { X } from "lucide-react";
+import toast from "react-hot-toast";
+
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -10,15 +17,49 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { useUser } from "@/context/userContest";
-import { X } from "lucide-react";
-import Image from "next/image";
 
 interface EditProfileProps {
   setEditProfile: (value: boolean) => void;
 }
 
 const EditProfile: React.FC<EditProfileProps> = ({ setEditProfile }) => {
-  const { user } = useUser();
+  const [bio, setBio] = useState("");
+
+  const { user, setUser } = useUser();
+
+  useEffect(() => {
+    if (user) {
+      setBio(user.bio);
+    }
+  }, []);
+
+  const handleProfileUpdate = async (e: React.FormEvent) => {
+    e.preventDefault();
+    try {
+      const response = await axios.put(
+        "/api/user/profile",
+        { bio },
+        {
+          headers: {
+            Authorization: `Bearer ${Cookies.get("token")}`,
+          },
+        }
+      );
+
+      if (response.status === 200) {
+        toast.success("Profile updated successfully!");
+        setUser({
+          ...user!,
+          bio,
+        });
+
+        setEditProfile(false);
+      }
+    } catch (error) {
+      console.error(error);
+      toast.error("Failed to update profile. Please try again later.");
+    }
+  };
 
   return (
     <Card className="relative">
@@ -27,7 +68,7 @@ const EditProfile: React.FC<EditProfileProps> = ({ setEditProfile }) => {
         <CardDescription>Update your profile information here.</CardDescription>
       </CardHeader>
       <CardContent>
-        <form action="" className="space-y-4">
+        <form onSubmit={handleProfileUpdate} className="space-y-4">
           <div className="flex items-center gap-4">
             <Image
               src={user?.profilePicture || ""}
@@ -51,6 +92,7 @@ const EditProfile: React.FC<EditProfileProps> = ({ setEditProfile }) => {
               placeholder="Enter your name"
               className="border rounded p-2"
               value={user?.name || ""}
+              readOnly
             />
           </div>
           <div className="space-y-2">
@@ -60,11 +102,18 @@ const EditProfile: React.FC<EditProfileProps> = ({ setEditProfile }) => {
               placeholder="Enter your username"
               className="border rounded p-2"
               value={user?.username || ""}
+              readOnly
             />
           </div>
           <div className="space-y-2">
             <Label htmlFor="bio">Bio</Label>
-            <Textarea id="bio" placeholder="Enter your bio" className="h-28" />
+            <Textarea
+              id="bio"
+              placeholder="Enter your bio"
+              className="h-28"
+              value={bio}
+              onChange={(e) => setBio(e.target.value)}
+            />
           </div>
 
           <Button type="submit">Submit</Button>
