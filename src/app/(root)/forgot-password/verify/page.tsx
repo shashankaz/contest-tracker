@@ -41,6 +41,11 @@ const ForgotPasswordVerify = () => {
       return;
     }
 
+    if (form.password.length < 8) {
+      toast.error("Password must be at least 8 characters");
+      return;
+    }
+
     try {
       setLoading(true);
       const response = await axios.post(
