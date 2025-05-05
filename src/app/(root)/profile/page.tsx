@@ -15,6 +15,7 @@ import {
   LogOut,
   User,
   Key,
+  Loader2,
 } from "lucide-react";
 import Link from "next/link";
 import toast from "react-hot-toast";
@@ -179,18 +180,52 @@ const UserProfile = () => {
     e.preventDefault();
 
     if (newPassword !== confirmPassword) {
+      toast.error("Passwords do not match");
+      return;
+    }
+
+    if (newPassword.length < 8) {
+      toast.error("Password must be at least 8 characters");
+      return;
+    }
+
+    if (newPassword === currentPassword) {
+      toast.error("New password cannot be the same as current password");
       return;
     }
 
     try {
       setPasswordLoading(true);
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+      const response = await axios.post(
+        "/api/user/update-password",
+        {
+          oldPassword: currentPassword,
+          newPassword: newPassword,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${Cookies.get("token")}`,
+          },
+        }
+      );
 
-      setCurrentPassword("");
-      setNewPassword("");
-      setConfirmPassword("");
+      if (response.status === 200) {
+        toast.success("Password updated successfully!");
+        setCurrentPassword("");
+        setNewPassword("");
+        setConfirmPassword("");
+      }
     } catch (error) {
       console.error(error);
+      if (axios.isAxiosError(error)) {
+        if (error.response?.status === 401) {
+          toast.error("Invalid password. Please try again.");
+        } else if (error.response?.status === 404) {
+          toast.error("User not found. Please try again.");
+        } else {
+          toast.error("An error occurred. Please try again later.");
+        }
+      }
     } finally {
       setPasswordLoading(false);
     }
@@ -513,7 +548,14 @@ const UserProfile = () => {
                       className="w-full"
                       disabled={passwordLoading}
                     >
-                      {passwordLoading ? "Updating..." : "Update Password"}
+                      {passwordLoading ? (
+                        <p className="flex items-center gap-2">
+                          Updating
+                          <Loader2 className="h-8 w-8 animate-spin" />
+                        </p>
+                      ) : (
+                        <p>Update Password</p>
+                      )}
                     </Button>
                   </form>
                 </CardContent>
