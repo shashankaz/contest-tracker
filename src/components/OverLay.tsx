@@ -1,3 +1,13 @@
+import Link from "next/link";
+import {
+  Bookmark,
+  BookmarkCheck,
+  Eye,
+  Search,
+  SquareChevronRight,
+  User,
+} from "lucide-react";
+
 import {
   Select,
   SelectContent,
@@ -5,10 +15,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Eye, Search, SquareChevronRight } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { ModeToggle } from "./theme-toggle";
-import { Button } from "./ui/button";
-import { Input } from "./ui/input";
+import { useUser } from "@/context/userContest";
 
 interface OverLayProps {
   setOpen: (value: boolean) => void;
@@ -39,10 +49,12 @@ const OverLay = ({
   search,
   handleSearchChange,
 }: OverLayProps) => {
+  const { user, token } = useUser();
+
   return (
     <div className="fixed inset-0 flex">
-      <div className="w-2/5" onClick={() => setOpen(false)}></div>
-      <div className="w-3/5 bg-white dark:bg-black h-screen ml-auto px-4">
+      <div className="w-1/3" onClick={() => setOpen(false)}></div>
+      <div className="w-2/3 bg-white dark:bg-black h-screen ml-auto px-4">
         <div className="h-20 flex items-center justify-between">
           <button onClick={() => setOpen(false)}>
             <SquareChevronRight />
@@ -83,11 +95,33 @@ const OverLay = ({
             </SelectContent>
           </Select>
           <Button onClick={() => setShowBookmarked(!showBookmarked)}>
-            {showBookmarked ? "Show All" : "Show Bookmarked"}
+            {showBookmarked ? (
+              <p className="flex items-center gap-2">
+                <Bookmark className="size-4" /> Show All
+              </p>
+            ) : (
+              <p className="flex items-center gap-2">
+                <BookmarkCheck className="size-4" />
+                Show Saved
+              </p>
+            )}
           </Button>
-          <Button variant="secondary">
-            <Eye /> {liveUsers}
+          <Button variant="secondary" title="Live users">
+            <Eye /> {liveUsers} LIVE
           </Button>
+          {!token && !user && (
+            <Link href="/login">
+              <Button className="w-full">Login</Button>
+            </Link>
+          )}
+          {token && user && (
+            <Link href="/profile">
+              <Button className="w-full">
+                <User className="size-4" />
+                Profile
+              </Button>
+            </Link>
+          )}
         </div>
       </div>
     </div>
