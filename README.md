@@ -1,58 +1,97 @@
-# Contest Tracker Documentation
+# Contest Tracker Hub
 
-## Overview
-Contest Tracker is an online tool designed to help users easily manage and keep track of coding contests. It allows users to view upcoming and past contests, bookmark them, and access solutions for questions from competitive programming platforms.
+A centralized platform for tracking upcoming programming contests across major competitive coding platforms.
+
+## About
+
+Contest Tracker Hub is designed to help competitive programmers stay updated with upcoming contests from major platforms like Codeforces, LeetCode, CodeChef, AtCoder, and GeeksforGeeks. The platform aggregates contest information into a unified, easy-to-navigate system with advanced filtering, search capabilities, and real-time updates.
+
+## Features
+
+### Frontend Features
+- **Centralized Contest Tracking**: View all upcoming contests from major platforms in one place
+- **Real-time Updates**: Live user count and contest information updates
+- **Filtering & Search**: Find contests by platform, date, or keywords
+- **User Accounts**: Personalized profiles with contest preferences
+- **Email Notifications**: Get reminders before contests start
+- **Responsive Design**: Optimized for both desktop and mobile devices
+- **Dark/Light Mode**: Theme support for better user experience
+- **Bookmarking**: Save contests for later reference
+
+### Backend Features
+- **Automated Contest Aggregation**: Daily updates from top coding platforms
+- **Real-time User Tracking**: Socket.IO integration for live user counts
+- **JWT Authentication**: Secure user authentication system
+- **Newsletter System**: Email subscriptions, reminders, and notifications
+- **Worker & Job Management**: Scheduled tasks for contest updates and reminders
+- **Rate Limiting**: Protection against abuse (100/15min for whitelisted, 10/15min otherwise)
+- **Feedback Collection**: Structured feedback system with admin alerts
+- **Comprehensive API**: RESTful endpoints for all platform features
+
+## Pages
+
+- **Home**: Dashboard showing upcoming contests with filtering options
+- **About**: Information about the platform and its features
+- **FAQ**: Frequently asked questions about the service
+- **Privacy Policy**: Details about data handling and user privacy
+- **Profile**: User account management and preferences
+- **Login/Register**: Authentication pages
 
 ## Tech Stack
-- **Frontend**: Next.js, React, Tailwind CSS
-- **Backend**: Node.js, Express
-- **Database**: MongoDB
-- **State Management**: Zustand
-- **HTTP Client**: Axios
-- **ODM (Object-Document Mapping)**: Mongoose
-- **Utilities**: date-fns, clsx
-- **Cache**: Redis, localStorage
 
-## Application Features
+### Frontend
+- **React 19**: Latest version of React for building the UI
+- **Next.js 15**: React framework with App Router for server components and routing
+- **TypeScript**: For type-safe code
+- **Tailwind CSS**: Utility-first CSS framework for styling
+- **Shadcn UI**: Component library built on Radix UI
+- **Zustand**: State management
+- **React Hook Form**: Form handling with Zod validation
+- **Socket.io Client**: Real-time updates for contest information
 
-### Routes
-- `/`: Displays all available contests (both upcoming and past) in a table format with pagination. Each contest entry includes the following columns:
-  - **Type/Platform**: The platform of the contest (e.g., LeetCode, CodeChef, Codeforces). A live mark is shown beside the type/platform for any live contest.
-  - **Contest Name**: The name of the contest.
-  - **Start Date & Time**: The start date and time of the contest.
-  - **Duration**: The duration of the contest.
-  - **End Date & Time**: The end date and time of the contest.
-  - **Time remaining/passed**: The time remaining before the contest starts or the time passed since it ended.
-  - **Save**: A bookmark feature to save the contest.
-  - **Solution**: A link to the solutions for the contest. The YouTube solution video is also embedded with the solution links.
-
-- `/solution/?type=${platform}&name=${contestName}&id=${contestId}`: Lists all question-wise solutions. If a solution is unavailable, a form is provided to add solutions. Solutions are fetched from a YouTube playlist video description of respective platforms, and if auto-fetching fails, a team member can manually attach the corresponding link.
-
-### Navbar Features
-- Dropdown menu to filter contests by platform: LeetCode, CodeChef, Codeforces, or all contests.
-- Bookmark toggle button to show or hide bookmarked contests.
-- Theme switcher to toggle between light and dark modes.
-
-### Responsive Design
-The UI is fully responsive, ensuring a seamless user experience across desktop, tablet, and mobile devices.
-
-### Caching
-- Redis is used to cache frequently accessed contest lists, improving performance and reducing database load by minimizing the number of queries.
-- localStorage is used on the client side to cache contest data, reducing the need for repeated API calls and improving performance.
+### Backend
+- **Next.js API Routes**: Server-side API endpoints
+- **Node.js & Express.js**: Core server framework
+- **TypeScript**: Type-safe backend code
+- **MongoDB**: Database for storing contest and user information
+- **Mongoose**: MongoDB object modeling
+- **Redis**: Caching, queueing and real-time data management
+- **Socket.io**: WebSocket implementation for real-time updates
+- **BullMQ & Agenda.js**: Job scheduling and queue management
+- **Nodemailer**: Email delivery system
+- **JWT**: Authentication token management
+- **bcryptjs**: Secure password hashing
 
 ## API Endpoints
 
-### Contest Data Endpoints
-- `GET /api/contest/{type}`: Retrieves contests based on the specified type (`all`, `leetcode`, `codechef`, `codeforces`, `past`).
+### Contest Routes
+- Fetch contests with filtering options
 
-### Solution Data Endpoints
-- `GET /api/solution`: Fetches stored solutions from MongoDB.
-- `GET /api/solution/{title}`: Retrieves the solution for a given contest title. If not found, a form is displayed to submit a solution.
+### User Routes
+- Authentication (register, login, password reset)
+- Profile management
+- Contest bookmarking
+- Preference settings
 
-### Platform-Specific Endpoints
-- `GET /api/codechef`: Lists YouTube playlist video metadata for CodeChef contests.
-- `GET /api/codechef/{title}`: If the contest title is present in the playlist, it extracts the links from the YouTube video description and returns them. Otherwise, it checks `/api/solution/{title}` and if not found, a form is displayed where a team member can manually attach the solution link.
-- `GET /api/leetcode`: Lists YouTube playlist video metadata for LeetCode contests.
-- `GET /api/leetcode/{title}`: If the contest title is present in the playlist, it extracts the links from the YouTube video description and returns them. Otherwise, it checks `/api/solution/{title}` and if not found, a form is displayed where a team member can manually attach the solution link.
-- `GET /api/codeforces`: Lists YouTube playlist video metadata for Codeforces contests.
-- `GET /api/codeforces/{title}`: If the contest title is present in the playlist, it extracts the links from the YouTube video description and returns them. Otherwise, it checks `/api/solution/{title}` and if not found, a form is displayed where a team member can manually attach the solution link.
+### Newsletter Routes
+- Subscription management
+- Email delivery logs
+
+### Feedback & Monitoring
+- Feedback submission
+- Usage statistics
+- System health monitoring
+
+## Automated Tasks
+
+- Daily contest updates at 1:00 AM IST
+- Reminder emails before contests
+- System health checks
+
+## Security Features
+
+- Dynamic rate limiting
+- CORS protection
+- Input validation
+- Secure authentication
+- Password hashing
