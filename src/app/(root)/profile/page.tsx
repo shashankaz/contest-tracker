@@ -299,9 +299,7 @@ const UserProfile = () => {
         <div className="flex flex-col sm:flex-row items-center sm:items-start gap-6 sm:gap-8">
           <div className="size-32 rounded-full overflow-hidden">
             <Image
-              src={
-                user?.profilePicture || "/placeholder.svg?height=128&width=128"
-              }
+              src={user?.profilePicture || "/placeholder.jpg"}
               alt="Profile Picture"
               width={128}
               height={128}
