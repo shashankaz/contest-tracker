@@ -6,7 +6,9 @@ A centralized platform for tracking upcoming programming contests across major c
 
 Contest Tracker Hub is designed to help competitive programmers stay updated with upcoming contests from major platforms like Codeforces, LeetCode, CodeChef, AtCoder, and GeeksforGeeks. The platform aggregates contest information into a unified, easy-to-navigate system with advanced filtering, search capabilities, and real-time updates.
 
-![alt text](image.png)
+![alt text](image-1.png)
+![alt text](image-2.png)
+![alt text](image-3.png)
 
 ## Features
 
