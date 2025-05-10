@@ -179,6 +179,56 @@ const UserProfile = () => {
     }
   };
 
+  const handleContestsTimer = async (value: string) => {
+    try {
+      const response = await axios.post(
+        "/api/user/update-preferences",
+        {
+          preferences: { reminderDelay: Number(value) },
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${Cookies.get("token")}`,
+          },
+        }
+      );
+
+      if (response.status === 200) {
+        toast.success("Reminder delay updated");
+        setUser({
+          ...user!,
+          reminderDelay: Number(value),
+        });
+      } else {
+        toast.error("Failed to update reminder delay. Please try again later.");
+      }
+    } catch (error) {
+      console.error(error);
+      toast.error("Failed to update reminder delay. Please try again later.");
+    }
+  };
+
+  const reminderDelayValue = () => {
+    if (user?.reminderDelay) {
+      switch (user.reminderDelay) {
+        case 6:
+          return "6";
+        case 5:
+          return "5";
+        case 4:
+          return "4";
+        case 3:
+          return "3";
+        case 2:
+          return "2";
+        case 1:
+          return "1";
+        case 0.5:
+          return "0.5";
+      }
+    }
+  };
+
   const handleResetPassword = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -479,21 +529,22 @@ const UserProfile = () => {
                 </div>
 
                 <div>
-                  <h4 className="font-medium text-sm mb-3">
-                    Reminder timing (Coming soon)
-                  </h4>
-                  <Select defaultValue="3hrs" disabled>
+                  <h4 className="font-medium text-sm mb-3">Reminder timing</h4>
+                  <Select
+                    defaultValue={reminderDelayValue()}
+                    onValueChange={handleContestsTimer}
+                  >
                     <SelectTrigger className="w-full">
                       <SelectValue placeholder="Select reminder time" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="6hrs">Before 6 hours</SelectItem>
-                      <SelectItem value="5hrs">Before 5 hours</SelectItem>
-                      <SelectItem value="4hrs">Before 4 hours</SelectItem>
-                      <SelectItem value="3hrs">Before 3 hours</SelectItem>
-                      <SelectItem value="2hrs">Before 2 hours</SelectItem>
-                      <SelectItem value="1hr">Before 1 hour</SelectItem>
-                      <SelectItem value="30min">Before 30 minutes</SelectItem>
+                      <SelectItem value="6">Before 6 hours</SelectItem>
+                      <SelectItem value="5">Before 5 hours</SelectItem>
+                      <SelectItem value="4">Before 4 hours</SelectItem>
+                      <SelectItem value="3">Before 3 hours</SelectItem>
+                      <SelectItem value="2">Before 2 hours</SelectItem>
+                      <SelectItem value="1">Before 1 hour</SelectItem>
+                      <SelectItem value="0.5">Before 30 minutes</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>

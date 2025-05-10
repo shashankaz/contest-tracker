@@ -22,6 +22,7 @@ interface User {
   bio: string;
   profilePicture: string;
   newsletterSubscribed: boolean;
+  reminderDelay: number;
 }
 
 interface UserContextType {
@@ -67,6 +68,7 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
             bio: user.bio,
             profilePicture: user.profilePicture,
             newsletterSubscribed: user.newsletterSubscribed,
+            reminderDelay: user.reminderDelay,
           });
         }
       })();
