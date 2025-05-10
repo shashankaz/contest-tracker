@@ -23,7 +23,7 @@ const Footer: React.FC<FooterProps> = ({ subscribeEmail }) => {
 
     try {
       setLoading(true);
-      subscribeEmail(email);
+      await subscribeEmail(email);
       setEmail("");
     } catch (error) {
       toast.error("Subscription failed. Please try again.");
