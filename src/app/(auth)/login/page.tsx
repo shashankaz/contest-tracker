@@ -58,6 +58,7 @@ const Login = () => {
           bio: response.data.bio,
           profilePicture: response.data.user.profilePicture,
           newsletterSubscribed: response.data.user.newsletterSubscribed,
+          reminderDelay: response.data.user.reminderDelay,
         });
         setToken(response.data.token);
         Cookies.set("token", response.data.token, { expires: 7 });
