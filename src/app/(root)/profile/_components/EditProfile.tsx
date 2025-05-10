@@ -31,6 +31,8 @@ const EditProfile: React.FC<EditProfileProps> = ({ setEditProfile }) => {
     if (user) {
       setBio(user.bio);
     }
+
+    // eslint-disable-next-line
   }, []);
 
   const handleProfileUpdate = async (e: React.FormEvent) => {

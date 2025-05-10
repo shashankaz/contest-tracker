@@ -108,6 +108,8 @@ const UserProfile = () => {
     }
 
     fetchSavedContests();
+
+    // eslint-disable-next-line
   }, []);
 
   const handleLogout = () => {

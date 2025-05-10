@@ -46,6 +46,8 @@ const Navbar = () => {
       socket.disconnect();
       console.log("Socket disconnected");
     };
+
+    // eslint-disable-next-line
   }, []);
 
   return (
